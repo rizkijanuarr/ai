@@ -39,7 +39,3 @@ This repository holds a simple **backend / frontend** skeleton meant to demonstr
 - **Controller → Service → Model**: controllers handle transport concerns, services hold business rules, models represent domain objects/data.
 - **DTO Separation**: `request/` and `response/` keep network contracts explicit and immutable.
 - **Advices**: centralized exception / response wrappers.
-
-## Contributing
-Pull requests are welcome.
-Follow [PEP 8](https://peps.python.org/pep-0008/) and keep commits atomic.

@@ -1,17 +1,3 @@
-# Flow Bisnis
-
-```mermaid
-flowchart LR
-    A[User] --> B[Input URL]
-    B --> C[Flask API]
-    C --> D[Scrape Website<br/>(meta-graph / meta-tags)]
-    D --> E[Pre-process]
-    E --> F[IndoBERT Classifier]
-    F --> G{Output}
-    G --> |Legal| H[Legal]
-    G --> |Ilegal| I[Ilegal]
-```
-
 ## Langkah Detail
 1. **User & Input URL**  
    Pengguna mengirim URL melalui antarmuka (web / REST).
@@ -41,30 +27,9 @@ flowchart LR
 
 ## Evaluasi Model
 
-| ---------------| --------------------------------------------- |
 | Metric         | Rumus                                         |
 | ---------------| --------------------------------------------- |
 | Accuracy       | (TP + TN) / (TP + FP + TN + FN)               |
 | Precision      | TP / (TP + FP)                                |
 | Recall         | TP / (TP + FN)                                |
 | F1-Score       | 2 × Precision × Recall / (Precision + Recall) |
-| ---------------| --------------------------------------------- |
-
-```python
-from sklearn.metrics import confusion_matrix, classification_report
-
-y_pred = model.predict(X_test)
-cm      = confusion_matrix(y_test, y_pred, labels=[1,0])  # 1=Legal, 0=Ilegal
-print(cm)                     # [[TP FP]\n [FN TN]]
-print(classification_report(y_test, y_pred, target_names=['Ilegal', 'Legal']))
-```
-
-### Visualisasi Confusion Matrix
-
-```python
-import seaborn as sns, matplotlib.pyplot as plt
-sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
-            xticklabels=['Legal', 'Ilegal'],
-            yticklabels=['Legal', 'Ilegal'])
-plt.xlabel('Predicted'); plt.ylabel('True'); plt.show()
-```

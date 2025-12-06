@@ -1,7 +1,6 @@
 # Instalasi & Package
 
 ## Paket Utama
-|----------------|------------------------------------------------|
 | Package        | Kegunaan                                       |
 |----------------|------------------------------------------------|
 | Flask          | REST API & routing                             |
@@ -17,13 +16,13 @@
 | seaborn        | Visualisasi confusion matrix                   |
 | matplotlib     | Visualisasi dasar                              |
 | tqdm           | Progress bar                                   |
-|----------------|------------------------------------------------|
+
 ## Langkah Instalasi Cepat
 1. Buat & aktifkan virtual environment
    ```bash
    python3 -m venv venv
    source venv/bin/activate  # macOS / Linux
-   # venv\Scripts\activate  # Windows
+   venv\Scripts\activate  # Windows
    ```
 2. Instal dependensi
    ```bash
