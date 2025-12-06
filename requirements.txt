@@ -1,0 +1,13 @@
+flask
+requests
+beautifulsoup4
+lxml
+transformers
+torch
+scikit-learn
+pandas
+seaborn
+matplotlib
+tqdm
+flask-cors
+flasgger
