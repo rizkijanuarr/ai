@@ -34,11 +34,6 @@ This repository holds a simple **backend / frontend** skeleton meant to demonstr
     └── templates/
 ```
 
-## Getting Started
-1. Create and activate a virtual environment.
-2. `pip install -r requirements.txt`.
-3. `python app.py`.
-
 ## Architectural Notes
 - **Layered + Versioned**: every public API is namespaced by version (`v1`, `v2`, …).
 - **Controller → Service → Model**: controllers handle transport concerns, services hold business rules, models represent domain objects/data.

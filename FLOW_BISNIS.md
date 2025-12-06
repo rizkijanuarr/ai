@@ -41,12 +41,14 @@ flowchart LR
 
 ## Evaluasi Model
 
-| Metric | Rumus |
-| ------ | ----- |
-| Accuracy | (TP + TN) / (TP + FP + TN + FN) |
-| Precision | TP / (TP + FP) |
-| Recall | TP / (TP + FN) |
-| F1-Score | 2 × Precision × Recall / (Precision + Recall) |
+| ---------------| --------------------------------------------- |
+| Metric         | Rumus                                         |
+| ---------------| --------------------------------------------- |
+| Accuracy       | (TP + TN) / (TP + FP + TN + FN)               |
+| Precision      | TP / (TP + FP)                                |
+| Recall         | TP / (TP + FN)                                |
+| F1-Score       | 2 × Precision × Recall / (Precision + Recall) |
+| ---------------| --------------------------------------------- |
 
 ```python
 from sklearn.metrics import confusion_matrix, classification_report

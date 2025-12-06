@@ -1,22 +1,23 @@
 # Instalasi & Package
 
 ## Paket Utama
-| Package | Kegunaan |
-|---------|----------|
-| Flask | REST API & routing |
-| flask-cors | Cross-Origin Resource Sharing (CORS) |
-| flasgger | Swagger UI & Documentation |
-| requests | Mengambil halaman web |
-| beautifulsoup4 | Parsing HTML & meta-tag |
-| lxml | Parser cepat untuk BeautifulSoup |
-| transformers | Memuat model IndoBERT |
-| torch | Backend deep learning |
-| scikit-learn | Confusion matrix & metrik |
-| pandas | Manipulasi dataset |
-| seaborn | Visualisasi confusion matrix |
-| matplotlib | Visualisasi dasar |
-| tqdm | Progress bar |
-
+|----------------|------------------------------------------------|
+| Package        | Kegunaan                                       |
+|----------------|------------------------------------------------|
+| Flask          | REST API & routing                             |
+| flask-cors     | Cross-Origin Resource Sharing (CORS)           |
+| flasgger       | Swagger UI & Documentation                     |
+| requests       | Mengambil halaman web                          |
+| beautifulsoup4 | Parsing HTML & meta-tag                        |
+| lxml           | Parser cepat untuk BeautifulSoup               |
+| transformers   | Memuat model IndoBERT                          |
+| torch          | Backend deep learning                          |
+| scikit-learn   | Confusion matrix & metrik                      |
+| pandas         | Manipulasi dataset                             |
+| seaborn        | Visualisasi confusion matrix                   |
+| matplotlib     | Visualisasi dasar                              |
+| tqdm           | Progress bar                                   |
+|----------------|------------------------------------------------|
 ## Langkah Instalasi Cepat
 1. Buat & aktifkan virtual environment
    ```bash
