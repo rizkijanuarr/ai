@@ -11,3 +11,4 @@ matplotlib
 tqdm
 flask-cors
 flasgger
+duckduckgo-search
