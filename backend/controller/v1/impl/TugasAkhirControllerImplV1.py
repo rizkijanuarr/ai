@@ -4,7 +4,7 @@ from backend.controller.advices.BaseControllerImpl import BaseControllerImpl
 from backend.controller.v1.TugasAkhirControllerV1 import TugasAkhirControllerV1
 from backend.service.v1.impl.TugasAkhirServiceImplV1 import TugasAkhirServiceImplV1
 from backend.request.v1.ScrapeRequestV1 import ScrapeRequestV1
-from backend.request.v1.ScrapeURLRequestV1 import ScrapeURLRequestV1
+
 from backend.utils.ResponseHelper import ResponseHelper
 
 @BaseControllerImpl
@@ -17,10 +17,4 @@ class TugasAkhirControllerImplV1(TugasAkhirControllerV1):
     def scrape_web(self, validation_request: ScrapeRequestV1):
         return ResponseHelper.create_response_data(
             self.service.scrape_url(validation_request)
-        )
-
-    # Google Search URL
-    def get_scrape_url(self, validation_request: ScrapeURLRequestV1):
-        return ResponseHelper.create_response_list(
-            self.service.get_scrape_url(validation_request)
         )
