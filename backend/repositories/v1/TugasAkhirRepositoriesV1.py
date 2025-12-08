@@ -1,6 +1,8 @@
 import re
 import requests
 import torch
+import socket
+from urllib.parse import urlparse
 from typing import List, Dict, Optional
 from bs4 import BeautifulSoup
 from transformers import BertTokenizer, AutoModelForSequenceClassification
@@ -194,11 +196,36 @@ class TugasAkhirRepositoriesV1:
         "wewenang",
         "kewenangan",
         "yurisdiksi",
-        "kompetensi",
-        "atribusi",
         "delegasi",
         "pelimpahan",
         "pengawasan",
+        "belanja",
+        "toko",
+        "jual",
+        "beli",
+        "produk",
+        "gratis",
+        "murah",
+        "diskon",
+        "promo",
+        "voucher",
+        "keranjang",
+        "checkout",
+        "pembayaran",
+        "pengiriman",
+        "kurir",
+        "ongkir",
+        "ulasan",
+        "rating",
+        "deskripsi produk",
+        "kategori",
+        "merk",
+        "brand",
+        "original",
+        "garansi",
+        "retur",
+        "refund",
+        "customer service",
         "supervisi",
         "monitoring",
         "evaluasi",
@@ -531,13 +558,26 @@ class TugasAkhirRepositoriesV1:
         "jual senjata"
     ]
 
+    _KNOWN_LEGAL_DOMAINS = [
+        "shopee", "tokopedia", "bukalapak", "lazada", "blibli", "zalora",
+        "youtube", "facebook", "instagram", "tiktok", "twitter", "x.com",
+        "google", "whatsapp", "linkedin", "gojek", "grab", "traveloka",
+        "tiket", "halodoc", "alodokter", "kompas", "detik", "cnnindonesia"
+    ]
+
     # --- SCRAPER CONFIGURATION ---
     _DEFAULT_HEADERS = {
-        "User-Agent": (
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/120.0.0.0 Safari/537.36"
-        )
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+        "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Connection": "keep-alive",
+        "Upgrade-Insecure-Requests": "1",
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "none",
+        "Sec-Fetch-User": "?1",
+        "Cache-Control": "max-age=0",
     }
 
     """
@@ -545,6 +585,11 @@ class TugasAkhirRepositoriesV1:
         Returns a dictionary with details.
     """
     def analyze_url(self, url: str) -> dict:
+        # 0. Check Whitelist Domain (Instant Pass)
+        # Useful for strong-security sites (Shopee, etc) that block scraping
+        parsed_domain = urlparse(url).netloc.lower()
+        is_whitelisted = any(d in parsed_domain for d in self._KNOWN_LEGAL_DOMAINS)
+        
         # 1. Scrape
         raw_content = self._scrape_meta(url)
 
@@ -552,15 +597,59 @@ class TugasAkhirRepositoriesV1:
         cleaned_content = self._clean_text(raw_content)
 
         # 3. Predict
-        prediction = self._predict(cleaned_content)
+        if is_whitelisted and not cleaned_content:
+             # Fallback if scraping failed but domain is trusted
+             prediction = {"label": "Legal (Trusted)", "probability": 0.99}
+             cleaned_content = f"Trusted Domain Content: {parsed_domain}"
+        else:
+             prediction = self._predict(cleaned_content)
+             
+             # Double check whitelist override for safety
+             if is_whitelisted and prediction["label"] == "Ilegal":
+                 prediction = {"label": "Legal (Trusted)", "probability": 0.95}
+        
+        # 4. Network Info (IP & Location)
+        net_info = self._get_network_info(url)
 
         return {
             "url": url,
-            "raw_content": raw_content,
+            "raw_content": raw_content or "Scraping Blocked/Empty",
             "cleaned_content": cleaned_content,
             "label": prediction["label"],
-            "probability": prediction["probability"]
+            "probability": prediction["probability"],
+            "ip": net_info["ip"],
+            "location": net_info["location"]
         }
+
+    def _get_network_info(self, url: str) -> Dict[str, str]:
+        info = {"ip": "Unknown", "location": "Unknown"}
+        try:
+            parsed = urlparse(url)
+            hostname = parsed.netloc
+            if not hostname:
+                 return info
+            
+            # Resolve IP
+            ip_address = socket.gethostbyname(hostname)
+            info["ip"] = ip_address
+            
+            # Resolve Location (Simple free API)
+            # Use short timeout to not block flow
+            try:
+                geo_resp = requests.get(f"http://ip-api.com/json/{ip_address}", timeout=3)
+                if geo_resp.status_code == 200:
+                    geo_data = geo_resp.json()
+                    if geo_data.get("status") == "success":
+                        city = geo_data.get("city", "")
+                        country = geo_data.get("country", "")
+                        info["location"] = f"{city}, {country}".strip(", ")
+            except Exception:
+                pass # Location is optional, don't fail
+                
+        except Exception as e:
+            print(f"[WARN] Network info failed for {url}: {e}")
+            
+        return info
 
     
     def _scrape_meta(self, url: str, timeout: int = 10) -> str:
@@ -616,21 +705,63 @@ class TugasAkhirRepositoriesV1:
         if not text:
             return {"label": "Unknown", "probability": 0.0}
 
-        tokenizer, model = self._get_model_instance()
+        # Langkah 1: Analisa Keyword (Legal vs Ilegal)
+        text_lower = text.lower()
         
-        encoded = tokenizer(text, truncation=True, padding=True, return_tensors="pt")
+        legal_matches = [w for w in self._LEGAL_KEYWORDS if w in text_lower]
+        ilegal_matches = [w for w in self._ILEGAL_KEYWORDS if w in text_lower]
+        
+        n_legal = len(legal_matches)
+        n_ilegal = len(ilegal_matches)
 
+        # Langkah 2: Prediksi Model AI (IndoBERT)
+        tokenizer, model = self._get_model_instance()
+        encoded = tokenizer(text, truncation=True, padding=True, return_tensors="pt")
+        
         with torch.no_grad():
             logits = model(**encoded).logits
             probs = torch.softmax(logits, dim=1).squeeze()
 
         if probs.dim() == 0:
-            prob_legal = float(probs)
+            prob_legal_model = float(probs)
         else:
-            prob_legal = float(probs[1])
+            prob_legal_model = float(probs[1]) # Probabilitas kelas Legal
 
-        label = "Legal" if prob_legal >= 0.5 else "Ilegal"
-        return {"label": label, "probability": prob_legal}
+        # Langkah 3: Logika Keputusan Hibrid
+        # Mulai dari pendapat Model
+        label = "Legal" if prob_legal_model >= 0.5 else "Ilegal"
+        final_prob = prob_legal_model
+
+        # Kondisi A: Dominasi Keyword Ilegal (Override Model)
+        # Jika keyword ileal lebih banyak, biasanya model salah konteks
+        if n_ilegal > n_legal:
+            # Jika model bilang Legal, tapi keyword Ilegal banyak -> Balik jadi Ilegal
+            if label == "Legal":
+                label = "Ilegal (Keyword)"
+                # Turunkan probabilitas jadi di bawah 0.5
+                final_prob = 0.4 
+        
+
+
+        # Kondisi B: Dominasi Keyword Legal (Koreksi Model)
+        # Jika Model bilang Ilegal (False Positive) tapi banyak keyword Legal dan NOL keyword Ilegal
+        if label == "Ilegal" and n_legal >= 3 and n_ilegal == 0:
+            label = "Legal (Keyword)"
+            final_prob = 0.85
+
+        # Format output
+        return {
+            "label": label, 
+            "probability": final_prob,
+            "keyword_stats": {
+                "legal": n_legal, 
+                "ilegal": n_ilegal,
+                "matches": {
+                    "legal": legal_matches[:5], # Show top 5 for debug
+                    "ilegal": ilegal_matches[:5]
+                }
+            }
+        }
 
     @classmethod
     def _get_model_instance(cls):

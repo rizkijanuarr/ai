@@ -19,5 +19,7 @@ class TugasAkhirServiceImplV1(TugasAkhirServiceV1):
             label=entity.get("label"),
             probability=entity.get("probability"),
             snippet=entity.get("cleaned_content"),
-            message="Analysis Successful"
+            message="Analysis Successful",
+            ip=entity.get("ip"),
+            location=entity.get("location")
         )

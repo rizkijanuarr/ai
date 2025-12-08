@@ -8,3 +8,5 @@ class ScrapeResponseV1:
     probability: float
     snippet: Optional[str] = None
     message: Optional[str] = None
+    ip: Optional[str] = None
+    location: Optional[str] = None
