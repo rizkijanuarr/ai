@@ -9,19 +9,6 @@
 
 ---
 
-## 🎯 Fitur Utama
-
-✅ **AI-Powered Classification** - IndoBERT model untuk analisa konteks  
-✅ **Hybrid Decision** - Kombinasi AI + Keyword Analysis  
-✅ **Cache System** - Analisa kedua instant (< 0.1 detik)  
-✅ **Transfer Learning** - Sistem belajar otomatis dari setiap analisa  
-✅ **Auto Error Detection** - Deteksi scraping failure (403, timeout, dll)  
-✅ **Network Info** - IP Address & Location tracking  
-✅ **RESTful API** - Clean architecture dengan Swagger docs  
-✅ **Colored Logging** - Easy debugging dengan colored console output  
-
----
-
 ## 📚 Dokumentasi Lengkap Untuk Informasi Detail
 
 ### **📖 Instalasi & Setup**
