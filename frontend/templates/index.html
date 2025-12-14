@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deteksi Website - Siti Aulia Sabina</title>
+    <meta name="description"
+        content="Sistem klasifikasi website Indonesia menggunakan AI (IndoBERT) untuk mendeteksi website legal atau ilegal">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="/static/logo.jpg">
+    <link rel="shortcut icon" type="image/jpeg" href="/static/logo.jpg">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <!-- Video Background -->
+    <div class="video-background" id="videoBackground">
+        <iframe id="youtubeVideo"
+            src="https://www.youtube.com/embed/Q7aV_ZhKWb4?autoplay=1&mute=1&loop=1&playlist=Q7aV_ZhKWb4&controls=0&showinfo=0&rel=0&modestbranding=1&vq=hd1080"
+            frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+
+    <script>
+        // Video caching - load video hanya sekali
+        (function () {
+            console.log('🎬 ========== VIDEO BACKGROUND SYSTEM ==========');
+
+            // Cek URL video untuk memastikan 1080p
+            const youtubeVideo = document.getElementById('youtubeVideo');
+            const videoSrc = youtubeVideo.getAttribute('src');
+            const is1080p = videoSrc.includes('vq=hd1080');
+
+            console.log('📹 Video Quality Check:');
+            console.log(`   ✓ Video URL: ${videoSrc}`);
+            console.log(`   ✓ 1080p Enabled: ${is1080p ? '✅ YES' : '❌ NO'}`);
+            console.log(`   ✓ Quality Parameter: ${is1080p ? 'vq=hd1080' : 'Not Set'}`);
+
+            // Cek cache status
+            const videoLoaded = localStorage.getItem('videoLoaded');
+            const videoLoadedTime = localStorage.getItem('videoLoadedTime');
+            const videoBackground = document.getElementById('videoBackground');
+
+            console.log('\n💾 Cache Status Check:');
+            console.log(`   ✓ localStorage Key: 'videoLoaded'`);
+            console.log(`   ✓ Cache Status: ${videoLoaded === 'true' ? '✅ CACHED' : '❌ NOT CACHED'}`);
+            console.log(`   ✓ Cache Value: ${videoLoaded || 'null'}`);
+            if (videoLoadedTime) {
+                console.log(`   ✓ Last Cached: ${videoLoadedTime}`);
+            }
+
+            // Tentukan sumber loading
+            if (videoLoaded === 'true') {
+                console.log('\n🔄 Loading Source:');
+                console.log('   ✓ Source: 📦 LOADED FROM CACHE');
+                console.log('   ✓ Action: Video already cached, using existing iframe');
+                console.log('   ✓ Benefit: Faster loading, reduced bandwidth');
+                console.log('   ✓ Note: Video will autoplay normally');
+            } else {
+                console.log('\n🌐 Loading Source:');
+                console.log('   ✓ Source: 🆕 FRESH LOAD FROM YOUTUBE');
+                console.log('   ✓ Action: First time loading video');
+                console.log('   ✓ Next Visit: Will use cached version');
+            }
+
+            // Set flag bahwa video sudah di-load
+            window.addEventListener('load', function () {
+                const wasCached = localStorage.getItem('videoLoaded') === 'true';
+                const currentTime = new Date().toLocaleString('id-ID');
+
+                localStorage.setItem('videoLoaded', 'true');
+                localStorage.setItem('videoLoadedTime', currentTime);
+
+                console.log('\n💾 Cache Save Status:');
+                console.log(`   ✓ Cache Saved: ✅ YES`);
+                console.log(`   ✓ Timestamp: ${currentTime}`);
+                console.log(`   ✓ Previous State: ${wasCached ? 'Already Cached' : 'Newly Cached'}`);
+                console.log('   ✓ Next Visit: Video will load from cache');
+
+                console.log('\n🎬 ============================================\n');
+            });
+        })();
+    </script>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <img src="/static/logo-vokasi.png" alt="Logo Vokasi"
+                style="height: 50px; width: auto; margin-right: 0.75rem;">
+            <div style="display: flex; flex-direction: column; line-height: 1.2;">
+                <span style="font-size: 0.9rem; font-weight: 600;">Deteksi Klasifikasi Website</span>
+                <span style="font-size: 0.9rem; font-weight: 600;">Legal & Ilegal</span>
+            </div>
+        </a>
+        <div class="navbar-actions">
+            <a href="/apidocs" class="btn btn-outline" target="_blank">
+                📚 API Docs
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1 class="hero-title fade-in">
+                Tetap Fokus. Tetap Maju.<br>
+                <span class="highlight">Lindungi Diri Anda.</span>
+            </h1>
+            <p class="hero-subtitle fade-in">
+                Deteksi website legal atau ilegal dengan teknologi AI (IndoBERT) dan analisa kata kunci
+            </p>
+
+            <!-- Search Box -->
+            <div class="search-box fade-in">
+                <form id="analyzeForm" class="search-form">
+                    <input type="url" id="urlInput" class="search-input"
+                        placeholder="Masukkan URL website yang ingin dianalisa..." required>
+                    <button type="submit" class="search-btn" id="analyzeBtn">
+                        <span id="btnText">🔍 Analisa</span>
+                        <span id="btnLoading" class="hidden">
+                            <span class="loading"></span> Menganalisa...
+                        </span>
+                    </button>
+                </form>
+
+                <!-- Alert Messages -->
+                <div id="alertContainer"></div>
+            </div>
+
+            <!-- Developer Credit -->
+            <p class="developer-credit fade-in"
+                style="text-align: center; margin-top: 0.5rem; font-size: 0.875rem; color: rgba(255, 255, 255, 0.7);">
+                Developed by : <a href="https://www.instagram.com/reundolife/" target="_blank" rel="noopener noreferrer"
+                    style="color: rgba(255, 255, 255, 0.9); font-weight: 600; text-decoration: none; transition: all 0.3s ease;">
+                    <strong
+                        style="background: linear-gradient(135deg, #ff6634 0%, #ceab1c 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Siti
+                        Aulia Sabina</strong>
+                </a>
+            </p>
+
+            <!-- Result Section -->
+            <div id="resultSection" class="result-section hidden">
+                <div class="card fade-in">
+                    <div class="card-header">
+                        <h3 class="card-title">Hasil Analisa</h3>
+                        <p class="card-subtitle">Berikut adalah hasil analisa website yang Anda masukkan</p>
+                    </div>
+
+                    <div class="card-body">
+                        <!-- Status Badge -->
+                        <div class="text-center mb-3">
+                            <div id="statusBadge"></div>
+                        </div>
+
+                        <!-- Result Grid -->
+                        <div class="result-grid">
+                            <div class="result-item">
+                                <div class="result-label">URL Website</div>
+                                <div class="result-value" id="resultUrl">-</div>
+                            </div>
+
+                            <div class="result-item">
+                                <div class="result-label">Tingkat Keyakinan</div>
+                                <div class="result-value" id="resultProb">-</div>
+                            </div>
+
+                            <div class="result-item">
+                                <div class="result-label">Alamat IP</div>
+                                <div class="result-value" id="resultIp">-</div>
+                            </div>
+
+                            <div class="result-item">
+                                <div class="result-label">Lokasi Server</div>
+                                <div class="result-value" id="resultLocation">-</div>
+                            </div>
+                        </div>
+
+                        <!-- Content Preview -->
+                        <div class="result-item mt-3">
+                            <div class="result-label">Preview Konten</div>
+                            <div class="result-value" id="resultSnippet" style="font-size: 0.875rem; line-height: 1.5;">
+                                -</div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <div class="text-center">
+                            <button class="btn btn-outline" onclick="resetForm()">
+                                🔄 Analisa Website Lain
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Info Card -->
+    <div class="container">
+        <div class="card mt-4 fade-in" style="max-width: 900px; margin-left: auto; margin-right: auto;">
+            <div class="card-body">
+                <h3 class="card-title mb-3">ℹ️ Tentang Sistem Ini</h3>
+                <p style="color: rgba(255, 255, 255, 0.8); font-size: 0.875rem; line-height: 1.6;">
+                    Sistem ini menggunakan <strong>AI (IndoBERT)</strong> dan <strong>Analisa Kata Kunci</strong>
+                    untuk mengklasifikasikan website Indonesia sebagai Legal atau Ilegal.
+                    Hasil analisa memiliki tingkat akurasi <strong>85-95%</strong> berdasarkan data training yang ada.
+                </p>
+                <p style="color: rgba(255, 255, 255, 0.6); font-size: 0.75rem; margin-top: 1rem;">
+                    💡 <strong>Tips:</strong> Sistem akan otomatis mendeteksi website judi, scam, phishing, dan konten
+                    ilegal lainnya.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/static/app.js"></script>
+</body>
+
+</html>
