@@ -5,5 +5,5 @@ from backend.response.v1.ScrapeResponseV1 import ScrapeResponseV1
 class TugasAkhirServiceV1(ABC):
     
     @abstractmethod
-    def scrape_url(self, request: ScrapeRequestV1) -> ScrapeResponseV1:
+    def getScrapeUrl(self, request: ScrapeRequestV1) -> ScrapeResponseV1:
         pass

@@ -16,5 +16,5 @@ class TugasAkhirControllerV1(ABC):
         group=SwaggerTypeGroup.APPS_WEB
     )
     @abstractmethod
-    def scrape_web(self, validation_request: ScrapeRequestV1) -> DataResponseParameter[ScrapeResponseV1]:
+    def getScrapeUrl(self, validation_request: ScrapeRequestV1) -> DataResponseParameter[ScrapeResponseV1]:
         pass

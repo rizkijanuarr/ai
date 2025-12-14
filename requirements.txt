@@ -13,3 +13,4 @@ flask-cors
 flasgger
 duckduckgo-search
 deep-translator
+colorlog

@@ -9,6 +9,5 @@ class HealthControllerImplV1(HealthControllerV1):
     def __init__(self):
         pass
 
-
     def health_check(self):
         return jsonify({"status": "ok"})
