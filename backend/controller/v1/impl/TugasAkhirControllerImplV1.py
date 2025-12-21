@@ -3,9 +3,10 @@ from dataclasses import asdict
 from backend.controller.advices.BaseControllerImpl import BaseControllerImpl
 from backend.controller.v1.TugasAkhirControllerV1 import TugasAkhirControllerV1
 from backend.service.v1.impl.TugasAkhirServiceImplV1 import TugasAkhirServiceImplV1
-from backend.request.v1.ScrapeRequestV1 import ScrapeRequestV1
-from backend.utils.Exceptions import ScrapingFailedException
 from backend.request.v1.ScrapeSerperRequestV1 import ScrapeSerperRequestV1
+from backend.request.v1.ListDatasetRequestV1 import ListDatasetRequestV1
+from backend.request.v1.SearchDatasetRequestV1 import SearchDatasetRequestV1
+
 
 from backend.utils.ResponseHelper import ResponseHelper
 
@@ -15,41 +16,15 @@ class TugasAkhirControllerImplV1(TugasAkhirControllerV1):
     def __init__(self):
         self.service = TugasAkhirServiceImplV1()
 
-    def getScrapeUrl(self, validation_request: ScrapeRequestV1):
-        try:
-            return ResponseHelper.create_response_data(
-                self.service.getScrapeUrl(validation_request)
-            )
-        except ScrapingFailedException as e:
-            # Return HTTP 422 Unprocessable Entity
-            return jsonify({
-                "success": False,
-                "message": "Scraping Failed - Cannot analyze content",
-                "data": None,
-                "errors": [{
-                    "code": "SCRAPING_FAILED",
-                    "title": "Content Scraping Failed",
-                    "message": e.message,
-                    "url": e.url
-                }]
-            }), 422
-
 
     def getScrapeSerper(self, validation_request: ScrapeSerperRequestV1):
         try:
-            print(f"[CONTROLLER DEBUG] Received request: {validation_request}")
             service_response = self.service.getScrapeSerper(validation_request)
-            print(f"[CONTROLLER DEBUG] Service response: {service_response}")
 
             final_response = ResponseHelper.create_response_list(service_response)
-            print(f"[CONTROLLER DEBUG] Final response: {final_response}")
 
             return final_response
         except Exception as e:
-            import traceback
-            print(f"[CONTROLLER ERROR] Exception caught: {e}")
-            print(f"[CONTROLLER ERROR] Traceback: {traceback.format_exc()}")
-            # Return HTTP 500 untuk error umum
             return jsonify({
                 "success": False,
                 "message": "Serper API Failed",
@@ -60,3 +35,83 @@ class TugasAkhirControllerImplV1(TugasAkhirControllerV1):
                     "message": str(e)
                 }]
             }), 500
+
+
+    def getListDataset(self, validation_request: ListDatasetRequestV1):
+        service_response = self.service.getListDataset(validation_request)
+        data = service_response['data']
+        total_data = service_response.get('total_data')
+        has_next = service_response.get('has_next', False)
+        is_first = service_response.get('is_first', False)
+        is_last = service_response.get('is_last', False)
+        current_page = service_response.get('current_page')
+        message = service_response.get('message')
+
+        final_response = ResponseHelper.create_response_slice(
+            data=data,
+            total_data=total_data,
+            has_next=has_next,
+            is_first=is_first,
+            is_last=is_last,
+            current_page=current_page,
+            message=message
+        )
+
+        return final_response
+
+
+    def getDetailDataset(self, id: int):
+        try:
+            id_int = int(id)
+            service_response = self.service.getDetailDataset(id_int)
+
+            final_response = ResponseHelper.create_response_data(service_response)
+
+            return final_response
+        except ValueError:
+            return jsonify({
+                "success": False,
+                "message": "Invalid ID format",
+                "data": None,
+                "errors": [{
+                    "code": "INVALID_ID",
+                    "title": "Invalid ID",
+                    "message": f"ID must be a valid integer, got: {id}"
+                }]
+            }), 400
+        except Exception as e:
+            return jsonify({
+                "success": False,
+                "message": "Detail Dataset Failed",
+                "data": None,
+                "errors": [{
+                    "code": "DETAIL_DATASET_ERROR",
+                    "title": "Detail Dataset Failed",
+                    "message": str(e)
+                }]
+            }), 500
+
+
+
+    def searchDataset(self, validation_request: SearchDatasetRequestV1):
+        service_response = self.service.searchDataset(validation_request)
+
+        data = service_response['data']
+        total_data = service_response.get('total_data')
+        has_next = service_response.get('has_next', False)
+        is_first = service_response.get('is_first', False)
+        is_last = service_response.get('is_last', False)
+        current_page = service_response.get('current_page')
+        message = service_response.get('message')
+
+        final_response = ResponseHelper.create_response_slice(
+            data=data,
+            total_data=total_data,
+            has_next=has_next,
+            is_first=is_first,
+            is_last=is_last,
+            current_page=current_page,
+            message=message
+        )
+
+        return final_response

@@ -4,6 +4,7 @@ import inspect
 import functools
 import yaml
 import json
+from dataclasses import is_dataclass, asdict
 
 def BaseControllerImpl(import_name=__name__):
     target_cls = None
@@ -44,6 +45,12 @@ def BaseControllerImpl(import_name=__name__):
                 method = getattr(meta_method, "__http_method__", None)
                 path = getattr(meta_method, "__route_path__", None)
                 route_kwargs = getattr(meta_method, "__route_kwargs__", {})
+
+                # Convert Spring Boot style {param} to Flask style <param>
+                if path:
+                    import re
+                    path = re.sub(r'\{(\w+)\}', r'<\1>', path)
+
 
                 # --- SWAGGER INJECTION ---
                 swagger_info = getattr(meta_method, "__swagger_info__", {})
@@ -153,11 +160,23 @@ def BaseControllerImpl(import_name=__name__):
                             if is_dataclass(result):
                                 # Recursive asdict untuk handle nested dataclass
                                 def recursive_asdict(obj):
-                                    if is_dataclass(obj):
-                                        return {
-                                            k: recursive_asdict(v)
-                                            for k, v in asdict(obj).items()
-                                        }
+                                    """Recursively convert dataclass to dict, handling nested structures"""
+                                    if is_dataclass(obj) and not isinstance(obj, type):
+                                        # Convert dataclass instance to dict
+                                        print(f"[ASDICT] Converting dataclass: {type(obj).__name__}")
+                                        try:
+                                            obj_dict = asdict(obj)
+                                            print(f"[ASDICT] Successfully converted {type(obj).__name__}")
+                                        except Exception as e:
+                                            print(f"[ASDICT ERROR] Failed to convert {type(obj).__name__}: {e}")
+                                            import traceback
+                                            print(traceback.format_exc())
+                                            raise
+
+                                        result_dict = {}
+                                        for field_name, field_value in obj_dict.items():
+                                            result_dict[field_name] = recursive_asdict(field_value)
+                                        return result_dict
                                     elif isinstance(obj, list):
                                         return [recursive_asdict(item) for item in obj]
                                     elif isinstance(obj, dict):
@@ -165,7 +184,25 @@ def BaseControllerImpl(import_name=__name__):
                                     else:
                                         return obj
 
-                                return jsonify(recursive_asdict(result))
+                                try:
+                                    print(f"[SERIALIZATION] Starting serialization of {type(result).__name__}")
+                                    serialized = recursive_asdict(result)
+                                    print(f"[SERIALIZATION] Successfully serialized")
+                                    return jsonify(serialized)
+                                except Exception as e:
+                                    print(f"[SERIALIZATION ERROR] {str(e)}")
+                                    import traceback
+                                    print(traceback.format_exc())
+                                    return jsonify({
+                                        "success": False,
+                                        "message": "Serialization Failed",
+                                        "data": None,
+                                        "errors": [{
+                                            "code": "SERIALIZATION_ERROR",
+                                            "title": "Serialization Failed",
+                                            "message": str(e)
+                                        }]
+                                    }), 500
 
                             return result
 
