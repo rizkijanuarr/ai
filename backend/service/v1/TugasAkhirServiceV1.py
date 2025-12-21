@@ -21,5 +21,9 @@ class TugasAkhirServiceV1(ABC):
         pass
 
     @abstractmethod
+    def getDatasetByLink(self, link: str) -> DetailDatasetResponseV1:
+        pass
+
+    @abstractmethod
     def searchDataset(self, request: SearchDatasetRequestV1) -> dict:
         pass

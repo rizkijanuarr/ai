@@ -9,6 +9,7 @@ from backend.request.v1.ScrapeSerperRequestV1 import ScrapeSerperRequestV1
 from backend.response.v1.ScrapeSerperResponseV1 import ScrapeSerperResponseV1
 from backend.request.v1.ListDatasetRequestV1 import ListDatasetRequestV1
 from backend.request.v1.SearchDatasetRequestV1 import SearchDatasetRequestV1
+from backend.request.v1.GetDatasetByLinkRequestV1 import GetDatasetByLinkRequestV1
 from backend.response.v1.ListDatasetResponseV1 import ListDatasetResponseV1
 from backend.response.v1.DetailDatasetResponseV1 import DetailDatasetResponseV1
 from abc import ABC, abstractmethod
@@ -43,6 +44,16 @@ class TugasAkhirControllerV1(ABC):
     )
     @abstractmethod
     def getDetailDataset(self, id: int) -> DataResponseParameter[DetailDatasetResponseV1]:
+        pass
+
+    @PostEndpoint(
+        value="/dataset-by-link",
+        tagName="Tugas Akhir Management",
+        description="Get Dataset by Link URL",
+        group=SwaggerTypeGroup.APPS_WEB
+    )
+    @abstractmethod
+    def getDatasetByLink(self, validation_request: GetDatasetByLinkRequestV1) -> DataResponseParameter[DetailDatasetResponseV1]:
         pass
 
     @PostEndpoint(

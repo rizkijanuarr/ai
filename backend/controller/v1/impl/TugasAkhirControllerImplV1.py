@@ -6,6 +6,7 @@ from backend.service.v1.impl.TugasAkhirServiceImplV1 import TugasAkhirServiceImp
 from backend.request.v1.ScrapeSerperRequestV1 import ScrapeSerperRequestV1
 from backend.request.v1.ListDatasetRequestV1 import ListDatasetRequestV1
 from backend.request.v1.SearchDatasetRequestV1 import SearchDatasetRequestV1
+from backend.request.v1.GetDatasetByLinkRequestV1 import GetDatasetByLinkRequestV1
 
 
 from backend.utils.ResponseHelper import ResponseHelper
@@ -91,6 +92,36 @@ class TugasAkhirControllerImplV1(TugasAkhirControllerV1):
                 }]
             }), 500
 
+
+    def getDatasetByLink(self, validation_request: GetDatasetByLinkRequestV1):
+        try:
+            service_response = self.service.getDatasetByLink(validation_request.link)
+
+            final_response = ResponseHelper.create_response_data(service_response)
+
+            return final_response
+        except ValueError as ve:
+            return jsonify({
+                "success": False,
+                "message": "Dataset Not Found",
+                "data": None,
+                "errors": [{
+                    "code": "NOT_FOUND",
+                    "title": "Dataset Not Found",
+                    "message": str(ve)
+                }]
+            }), 404
+        except Exception as e:
+            return jsonify({
+                "success": False,
+                "message": "Get Dataset by Link Failed",
+                "data": None,
+                "errors": [{
+                    "code": "DATASET_BY_LINK_ERROR",
+                    "title": "Get Dataset by Link Failed",
+                    "message": str(e)
+                }]
+            }), 500
 
 
     def searchDataset(self, validation_request: SearchDatasetRequestV1):

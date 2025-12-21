@@ -338,6 +338,66 @@ class TugasAkhirRepositoriesV1:
             raise
 
 
+    #-----------------------------------------------------------
+    # GET DATASET BY LINK
+    #-----------------------------------------------------------
+    def getDatasetByLink(self, link: str):
+        """
+        Get single dataset record by link URL
+
+        Args:
+            link (str): Link URL to search for
+
+        Returns:
+            dict: Single record data
+
+        Raises:
+            ValueError: If link not found or file error
+        """
+        import csv
+        import os
+
+        logger.info(f"[DATASET] Searching for link: {link}")
+
+        # Get project root
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+
+        # Use merged CSV file
+        csv_file = os.path.join(
+            project_root,
+            'output/data/crawl_serper/ALL_DATA_COMBINED_MERGED.csv'
+        )
+
+        try:
+            with open(csv_file, 'r', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+
+                for row in reader:
+                    # Case-insensitive comparison
+                    if row['Link'].strip().lower() == link.strip().lower():
+                        result = {
+                            'id': int(row['No']),
+                            'keyword': row['Keyword'],
+                            'title': row['Title'],
+                            'link': row['Link'],
+                            'description': row['Description'],
+                            'is_legal': int(row['is_legal']),
+                            'is_ilegal': int(row['is_ilegal'])
+                        }
+                        logger.info(f"[DATASET] Found record with link={link}")
+                        return result
+
+            # If not found
+            logger.error(f"[DATASET] Record with link={link} not found")
+            raise ValueError(f"Dataset with link '{link}' not found")
+
+        except FileNotFoundError:
+            logger.error(f"[DATASET] Merged CSV file not found: {csv_file}")
+            raise ValueError(f"Merged dataset file not found")
+        except Exception as e:
+            logger.error(f"[DATASET] Error reading CSV: {str(e)}")
+            raise
+
 
     #-----------------------------------------------------------
     # SEARCH DATASET

@@ -107,7 +107,10 @@ class TugasAkhirServiceImplV1(TugasAkhirServiceV1):
         }
 
 
-
+    def getDatasetByLink(self, link: str) -> DetailDatasetResponseV1:
+        """Get single dataset detail by link URL"""
+        data = self.repository.getDatasetByLink(link)
+        return self.responsesDetailDataset(data)
 
 
     def responsesDetailDataset(self, entity: dict) -> DetailDatasetResponseV1:
