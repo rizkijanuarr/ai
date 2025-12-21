@@ -1,0 +1,19 @@
+<!-- Dataset Card Component -->
+<div class="card fade-in">
+    <div class="card-header">
+        <h3 class="card-title">{{ title }}</h3>
+        {% if subtitle %}
+        <p class="card-subtitle">{{ subtitle }}</p>
+        {% endif %}
+    </div>
+
+    <div class="card-body">
+        {{ content | safe }}
+    </div>
+
+    {% if footer %}
+    <div class="card-footer">
+        {{ footer | safe }}
+    </div>
+    {% endif %}
+</div>

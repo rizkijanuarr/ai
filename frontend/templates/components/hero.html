@@ -1,0 +1,29 @@
+<!-- Hero Section Component -->
+<section class="hero">
+    <div class="container">
+        <h1 class="hero-title fade-in">
+            Tetap Fokus. Tetap Maju.<br>
+            <span class="highlight">Lindungi Diri Anda.</span>
+        </h1>
+        <p class="hero-subtitle fade-in">
+            Deteksi website legal atau ilegal dengan teknologi AI (IndoBERT) dan analisa kata kunci
+        </p>
+
+        <!-- Search Box -->
+        <div class="search-box fade-in">
+            <form id="analyzeForm" class="search-form">
+                <input type="url" id="urlInput" class="search-input"
+                    placeholder="Masukkan URL website yang ingin dianalisa..." required>
+                <button type="submit" class="search-btn" id="analyzeBtn">
+                    <span id="btnText">🔍 Analisa</span>
+                    <span id="btnLoading" class="hidden">
+                        <span class="loading"></span> Menganalisa...
+                    </span>
+                </button>
+            </form>
+
+            <!-- Alert Messages -->
+            <div id="alertContainer"></div>
+        </div>
+    </div>
+</section>

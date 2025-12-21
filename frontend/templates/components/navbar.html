@@ -1,0 +1,22 @@
+<!-- Navbar Component -->
+<nav class="navbar">
+    <a href="/" class="navbar-brand">
+        <img src="/static/logo-vokasi.png" alt="Logo Vokasi"
+            style="height: 50px; width: auto; margin-right: 0.75rem;">
+        <div style="display: flex; flex-direction: column; line-height: 1.2;">
+            <span style="font-size: 0.9rem; font-weight: 600;">Deteksi Klasifikasi Website</span>
+            <span style="font-size: 0.9rem; font-weight: 600;">Legal & Ilegal</span>
+        </div>
+    </a>
+    <div class="navbar-actions">
+        <button class="btn btn-outline" onclick="toggleEvaluationSection()">
+            📈 Evaluasi Model
+        </button>
+        <button class="btn btn-outline" onclick="toggleDatasetSection()">
+            📊 Dataset Model
+        </button>
+        <a href="/apidocs" class="btn btn-outline" target="_blank">
+            📚 API Docs
+        </a>
+    </div>
+</nav>

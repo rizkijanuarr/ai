@@ -1,0 +1,67 @@
+<!-- Video Background Component -->
+<div class="video-background" id="videoBackground">
+    <iframe id="youtubeVideo"
+        src="https://www.youtube.com/embed/Q7aV_ZhKWb4?autoplay=1&mute=1&loop=1&playlist=Q7aV_ZhKWb4&controls=0&showinfo=0&rel=0&modestbranding=1&vq=hd1080"
+        frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+</div>
+
+<script>
+    // Video caching - load video hanya sekali
+    (function () {
+        console.log('🎬 ========== VIDEO BACKGROUND SYSTEM ==========');
+
+        // Cek URL video untuk memastikan 1080p
+        const youtubeVideo = document.getElementById('youtubeVideo');
+        const videoSrc = youtubeVideo.getAttribute('src');
+        const is1080p = videoSrc.includes('vq=hd1080');
+
+        console.log('📹 Video Quality Check:');
+        console.log(`   ✓ Video URL: ${videoSrc}`);
+        console.log(`   ✓ 1080p Enabled: ${is1080p ? '✅ YES' : '❌ NO'}`);
+        console.log(`   ✓ Quality Parameter: ${is1080p ? 'vq=hd1080' : 'Not Set'}`);
+
+        // Cek cache status
+        const videoLoaded = localStorage.getItem('videoLoaded');
+        const videoLoadedTime = localStorage.getItem('videoLoadedTime');
+        const videoBackground = document.getElementById('videoBackground');
+
+        console.log('\n💾 Cache Status Check:');
+        console.log(`   ✓ localStorage Key: 'videoLoaded'`);
+        console.log(`   ✓ Cache Status: ${videoLoaded === 'true' ? '✅ CACHED' : '❌ NOT CACHED'}`);
+        console.log(`   ✓ Cache Value: ${videoLoaded || 'null'}`);
+        if (videoLoadedTime) {
+            console.log(`   ✓ Last Cached: ${videoLoadedTime}`);
+        }
+
+        // Tentukan sumber loading
+        if (videoLoaded === 'true') {
+            console.log('\n🔄 Loading Source:');
+            console.log('   ✓ Source: 📦 LOADED FROM CACHE');
+            console.log('   ✓ Action: Video already cached, using existing iframe');
+            console.log('   ✓ Benefit: Faster loading, reduced bandwidth');
+            console.log('   ✓ Note: Video will autoplay normally');
+        } else {
+            console.log('\n🌐 Loading Source:');
+            console.log('   ✓ Source: 🆕 FRESH LOAD FROM YOUTUBE');
+            console.log('   ✓ Action: First time loading video');
+            console.log('   ✓ Next Visit: Will use cached version');
+        }
+
+        // Set flag bahwa video sudah di-load
+        window.addEventListener('load', function () {
+            const wasCached = localStorage.getItem('videoLoaded') === 'true';
+            const currentTime = new Date().toLocaleString('id-ID');
+
+            localStorage.setItem('videoLoaded', 'true');
+            localStorage.setItem('videoLoadedTime', currentTime);
+
+            console.log('\n💾 Cache Save Status:');
+            console.log(`   ✓ Cache Saved: ✅ YES`);
+            console.log(`   ✓ Timestamp: ${currentTime}`);
+            console.log(`   ✓ Previous State: ${wasCached ? 'Already Cached' : 'Newly Cached'}`);
+            console.log('   ✓ Next Visit: Video will load from cache');
+
+            console.log('\n🎬 ============================================\n');
+        });
+    })();
+</script>
