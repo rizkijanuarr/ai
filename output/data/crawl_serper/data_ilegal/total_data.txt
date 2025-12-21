@@ -1,0 +1,48 @@
+========================================
+LAPORAN TOTAL DATA CRAWLING SERPER
+Tanggal: 21 Desember 2025
+========================================
+
+DETAIL PER FILE:
+----------------------------------------
+
+1.  SLOT_20251221_104406.csv                        : 62 data
+2.  bandar_slot_terpercaya_20251221_110420.csv      : 49 data
+3.  bonus_new_member_slot_20251221_111746.csv       : 41 data
+4.  casino_online_20251221_110815.csv               : 185 data
+5.  microgaming_20251221_112224.csv                 : 40 data
+6.  pg_soft_20251221_111451.csv                     : 58 data
+7.  poker_online_20251221_111147.csv                : 129 data
+8.  porno_20251221_113207.csv                       : 220 data
+9.  pragmatic_play_slot_20251221_105624.csv         : 52 data
+10. situs_slot_gacor_20251221_104913.csv            : 65 data
+11. slot88_20251221_105336.csv                      : 87 data
+12. slot_deposit_10rb_20251221_111949.csv           : 46 data
+13. slot_deposit_pulsa_20251221_110113.csv          : 46 data
+14. slot_gacor_maxwin_20251221_112902.csv           : 62 data
+
+========================================
+TOTAL KESELURUHAN: 1,142 DATA
+========================================
+
+KATEGORI TERBANYAK:
+1. porno                    : 220 data (19.3%)
+2. casino_online            : 185 data (16.2%)
+3. poker_online             : 129 data (11.3%)
+4. slot88                   : 87 data (7.6%)
+5. situs_slot_gacor         : 65 data (5.7%)
+
+KATEGORI TERSEDIKIT:
+1. microgaming              : 40 data (3.5%)
+2. bonus_new_member_slot    : 41 data (3.6%)
+3. slot_deposit_10rb        : 46 data (4.0%)
+4. slot_deposit_pulsa       : 46 data (4.0%)
+5. bandar_slot_terpercaya   : 49 data (4.3%)
+
+========================================
+CATATAN:
+- Semua data exclude header CSV
+- Total 14 file CSV berhasil di-crawl
+- Keyword "porno" menghasilkan data terbanyak
+- Rata-rata data per file: 81.6 data
+========================================

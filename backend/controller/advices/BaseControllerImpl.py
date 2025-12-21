@@ -17,17 +17,17 @@ def BaseControllerImpl(import_name=__name__):
             if hasattr(base, "__controller_prefix__"):
                 prefix = base.__controller_prefix__
                 break
-        
+
         bp = Blueprint(cls.__name__.lower(), import_name, url_prefix=prefix)
         CORS(bp, resources={r"/*": {"origins": "*"}})
-        
+
         instance = cls()
         existing_routes = set()
-        
+
         for attr_name in dir(instance):
             if attr_name.startswith("_"):
                 continue
-                
+
             actual_method = getattr(instance, attr_name)
             if not callable(actual_method):
                 continue
@@ -39,12 +39,12 @@ def BaseControllerImpl(import_name=__name__):
                     if hasattr(candidate, "__http_method__"):
                         meta_method = candidate
                         break
-            
+
             if meta_method:
                 method = getattr(meta_method, "__http_method__", None)
                 path = getattr(meta_method, "__route_path__", None)
                 route_kwargs = getattr(meta_method, "__route_kwargs__", {})
-                
+
                 # --- SWAGGER INJECTION ---
                 swagger_info = getattr(meta_method, "__swagger_info__", {})
                 if swagger_info:
@@ -54,7 +54,7 @@ def BaseControllerImpl(import_name=__name__):
                     tag_name = swagger_info.get("tagName")
                     if tag_name:
                         tags.append(tag_name)
-                    
+
                     if tags:
                         swag["tags"] = tags
 
@@ -80,17 +80,17 @@ def BaseControllerImpl(import_name=__name__):
                     responses = SwaggerStructureResponse.generate_responses(meta_method, initial_responses)
 
                     swag["responses"] = responses
-                    
+
                     def create_wrapper(method_to_wrap, swag_data):
                         import functools
                         from flask import request, jsonify
                         from dataclasses import is_dataclass, asdict
                         import inspect
-                        
+
                         sig = inspect.signature(method_to_wrap)
                         dataclass_param_name = None
                         dataclass_type = None
-                        
+
                         for name, param in sig.parameters.items():
                              if name == 'self': continue
                              if is_dataclass(param.annotation):
@@ -101,7 +101,9 @@ def BaseControllerImpl(import_name=__name__):
                         @functools.wraps(method_to_wrap)
                         def wrapper(*args, **kwargs):
                             if dataclass_param_name and dataclass_type:
-                                json_body = request.get_json(silent=True) or {}
+                                # Force JSON parsing even without Content-Type header
+                                # This allows Postman to work without explicitly setting Content-Type
+                                json_body = request.get_json(force=True, silent=True) or {}
                                 try:
                                     dto_instance = dataclass_type(**json_body)
                                     if hasattr(dto_instance, '__post_init__'):
@@ -109,38 +111,65 @@ def BaseControllerImpl(import_name=__name__):
                                     kwargs[dataclass_param_name] = dto_instance
                                 except ValueError as ve:
                                      return jsonify({
-                                         "success": False, 
-                                         "message": "Validation Error", 
+                                         "success": False,
+                                         "message": "Validation Error",
                                          "errors": [{"code": 400, "title": "Validation Error", "message": str(ve)}]
                                      }), 400
                                 except TypeError as te:
-                                     # Structure Error
+                                     # Structure Error - Add detailed logging
+                                     import traceback
+                                     print(f"[DEBUG] TypeError during dataclass instantiation:")
+                                     print(f"[DEBUG] Dataclass type: {dataclass_type}")
+                                     print(f"[DEBUG] JSON body: {json_body}")
+                                     print(f"[DEBUG] Error: {te}")
+                                     print(f"[DEBUG] Traceback: {traceback.format_exc()}")
                                      return jsonify({
-                                         "success": False, 
-                                         "message": "Invalid Request Format", 
+                                         "success": False,
+                                         "message": "Invalid Request Format",
                                          "errors": [{"code": 400, "title": "Type Error", "message": str(te)}]
                                      }), 400
                                 except Exception as e:
+                                     import traceback
+                                     print(f"[DEBUG] Unexpected error during dataclass instantiation:")
+                                     print(f"[DEBUG] Error type: {type(e)}")
+                                     print(f"[DEBUG] Error: {e}")
+                                     print(f"[DEBUG] Traceback: {traceback.format_exc()}")
                                      return jsonify({
-                                         "success": False, 
-                                         "message": "Bad Request", 
+                                         "success": False,
+                                         "message": "Bad Request",
                                          "errors": [{"code": 400, "title": "Bad Request", "message": str(e)}]
                                      }), 400
+
 
                             try:
                                 result = method_to_wrap(*args, **kwargs)
                             except Exception as e:
                                 return jsonify({
-                                    "success": False, 
-                                    "message": "Internal Server Error", 
+                                    "success": False,
+                                    "message": "Internal Server Error",
                                     "errors": [{"code": 500, "title": "Internal Error", "message": str(e)}]
                                 }), 500
 
                             if is_dataclass(result):
-                                return jsonify(asdict(result))
-                            
+                                # Recursive asdict untuk handle nested dataclass
+                                def recursive_asdict(obj):
+                                    if is_dataclass(obj):
+                                        return {
+                                            k: recursive_asdict(v)
+                                            for k, v in asdict(obj).items()
+                                        }
+                                    elif isinstance(obj, list):
+                                        return [recursive_asdict(item) for item in obj]
+                                    elif isinstance(obj, dict):
+                                        return {k: recursive_asdict(v) for k, v in obj.items()}
+                                    else:
+                                        return obj
+
+                                return jsonify(recursive_asdict(result))
+
                             return result
-                        
+
+
                         wrapper.swag = swag_data
                         doc_content = method_to_wrap.__doc__ or ""
                         wrapper.__doc__ = f"{doc_content}\n---\n{yaml.dump(swag_data)}"
@@ -155,7 +184,7 @@ def BaseControllerImpl(import_name=__name__):
                 if key not in existing_routes:
                     bp.add_url_rule(path, view_func=view_func_to_register, methods=[method], **route_kwargs)
                     existing_routes.add(key)
-                    
+
         cls.__blueprint__ = bp
         return cls
 

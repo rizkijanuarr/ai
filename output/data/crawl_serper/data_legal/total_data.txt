@@ -1,0 +1,54 @@
+========================================
+LAPORAN TOTAL DATA CRAWLING SERPER
+Kategori: KEYWORD LEGAL
+Tanggal: 21 Desember 2025
+========================================
+
+DETAIL PER FILE:
+----------------------------------------
+
+1.  aplikasi_belajar_bahasa_20251221_115409.csv         : 270 data
+2.  berita_teknologi_20251221_120419.csv                : 280 data
+3.  jasa_fotografi_20251221_120241.csv                  : 232 data
+4.  jual_beli_mobil_bekas_20251221_120056.csv           : 230 data
+5.  kursus_online_terpercaya_20251221_114959.csv        : 360 data
+6.  startup_indonesia_20251221_120538.csv               : 267 data
+7.  toko_buku_online_20251221_115219.csv                : 230 data
+8.  unesa_manajamen_informatika_20251221_115713.csv     : 243 data
+9.  unesa_teknik_informatika_20251221_115844.csv        : 106 data
+10. universitas_terbaik_indonesia_20251221_114724.csv   : 245 data
+
+========================================
+TOTAL KESELURUHAN: 2,463 DATA
+========================================
+
+KATEGORI TERBANYAK:
+1. kursus_online_terpercaya              : 360 data (14.6%)
+2. berita_teknologi                      : 280 data (11.4%)
+3. aplikasi_belajar_bahasa               : 270 data (11.0%)
+4. startup_indonesia                     : 267 data (10.8%)
+5. universitas_terbaik_indonesia         : 245 data (10.0%)
+
+KATEGORI TERSEDIKIT:
+1. unesa_teknik_informatika              : 106 data (4.3%)
+2. jual_beli_mobil_bekas                 : 230 data (9.3%)
+3. toko_buku_online                      : 230 data (9.3%)
+4. jasa_fotografi                        : 232 data (9.4%)
+5. unesa_manajamen_informatika           : 243 data (9.9%)
+
+========================================
+STATISTIK:
+- Total file CSV                         : 10 file
+- Rata-rata data per file                : 246.3 data
+- Data terbanyak (kursus online)         : 360 data
+- Data tersedikit (unesa TI)             : 106 data
+- Selisih max-min                        : 254 data
+========================================
+
+CATATAN:
+✅ Semua keyword 100% LEGAL dan AMAN
+✅ Data exclude header CSV
+✅ Cocok untuk training AI/ML
+✅ Beragam sektor: Pendidikan, Teknologi, Bisnis, E-commerce
+✅ Total data 2x lipat lebih banyak dari data ilegal (1,142 vs 2,463)
+========================================
