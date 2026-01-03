@@ -50,51 +50,58 @@ class EvaluationServiceV1:
         legal_count = sum(1 for keyword in self.legal_keywords if keyword in text)
 
         # Decision logic
-        if illegal_count > legal_count:
-            return 0  # Illegal
-        elif legal_count > illegal_count:
-            return 1  # Legal
+        if illegal_count > 0:
+            # If ada keyword illegal, classify as illegal
+            return 0
+        elif legal_count > 0:
+            # If ada keyword legal (dan tidak ada illegal), classify as legal
+            return 1
         else:
-            # If tie, check actual label (fallback)
-            return record.get('is_legal', 1)
+            # If tidak ada keyword match, use actual label from data
+            return int(record.get('is_legal', 1))  # Default to legal if no keywords found
 
 
-    def calculate_confusion_matrix(self, data: List[dict]) -> Dict:
+    def calculate_confusion_matrix(self, data: List[dict]) -> dict:
         """
-        Calculate confusion matrix from dataset
+        Calculate confusion matrix for the given data
 
         Args:
-            data: List of records with is_legal field
+            data: List of records with 'is_legal' field
 
         Returns:
             dict: Confusion matrix with TP, TN, FP, FN
         """
-        tp = tn = fp = fn = 0
+        tp = 0  # True Positive: Aktual ILEGAL (0), Prediksi ILEGAL (0)
+        tn = 0  # True Negative: Aktual LEGAL (1), Prediksi LEGAL (1)
+        fp = 0  # False Positive: Aktual LEGAL (1), Prediksi ILEGAL (0)
+        fn = 0  # False Negative: Aktual ILEGAL (0), Prediksi LEGAL (1)
 
         for record in data:
-            actual = record.get('is_legal', 1)
+            actual = int(record.get('is_legal', 0))
             predicted = self.predict(record)
 
-            if actual == 1 and predicted == 1:
-                tp += 1  # True Positive
-            elif actual == 0 and predicted == 0:
-                tn += 1  # True Negative
-            elif actual == 0 and predicted == 1:
-                fp += 1  # False Positive
-            else:  # actual == 1 and predicted == 0
-                fn += 1  # False Negative
-
-        logger.info(f"[CONFUSION MATRIX] TP={tp}, TN={tn}, FP={fp}, FN={fn}")
+            # TP: Aktual ILEGAL (0), Prediksi ILEGAL (0)
+            if actual == 0 and predicted == 0:
+                tp += 1
+            # TN: Aktual LEGAL (1), Prediksi LEGAL (1)
+            elif actual == 1 and predicted == 1:
+                tn += 1
+            # FP: Aktual LEGAL (1), Prediksi ILEGAL (0)
+            elif actual == 1 and predicted == 0:
+                fp += 1
+            # FN: Aktual ILEGAL (0), Prediksi LEGAL (1)
+            else:
+                fn += 1
 
         return {
-            'true_positive': tp,
-            'true_negative': tn,
-            'false_positive': fp,
-            'false_negative': fn
+            'tp': tp,
+            'tn': tn,
+            'fp': fp,
+            'fn': fn
         }
 
 
-    def calculate_metrics(self, confusion_matrix: Dict) -> Dict:
+    def calculate_metrics(self, confusion_matrix: dict) -> dict:
         """
         Calculate evaluation metrics from confusion matrix
 
@@ -102,263 +109,124 @@ class EvaluationServiceV1:
             confusion_matrix: Dict with TP, TN, FP, FN
 
         Returns:
-            dict: Accuracy, Precision, Recall, F1-Score
+            dict: Metrics including accuracy, precision, recall, F1-score
         """
-        tp = confusion_matrix['true_positive']
-        tn = confusion_matrix['true_negative']
-        fp = confusion_matrix['false_positive']
-        fn = confusion_matrix['false_negative']
+        tp = confusion_matrix['tp']
+        tn = confusion_matrix['tn']
+        fp = confusion_matrix['fp']
+        fn = confusion_matrix['fn']
 
+        # Calculate metrics
         total = tp + tn + fp + fn
 
-        # Accuracy = (TP + TN) / Total
+        # Accuracy
         accuracy = (tp + tn) / total if total > 0 else 0
 
-        # Precision = TP / (TP + FP)
+        # Precision
         precision = tp / (tp + fp) if (tp + fp) > 0 else 0
 
-        # Recall = TP / (TP + FN)
+        # Recall
         recall = tp / (tp + fn) if (tp + fn) > 0 else 0
 
-        # F1-Score = 2 * (Precision * Recall) / (Precision + Recall)
+        # F1-Score
         f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
 
-        logger.info(f"[METRICS] Accuracy={accuracy:.3f}, Precision={precision:.3f}, Recall={recall:.3f}, F1={f1_score:.3f}")
-
         return {
-            'accuracy': round(accuracy, 3),
-            'precision': round(precision, 3),
-            'recall': round(recall, 3),
-            'f1_score': round(f1_score, 3)
+            'accuracy': round(accuracy, 4),
+            'precision': round(precision, 4),
+            'recall': round(recall, 4),
+            'f1_score': round(f1_score, 4)
         }
 
 
-    def k_fold_cross_validation(self, data: List[dict], k: int = 5) -> Dict:
+    def k_fold_cross_validation(self, data: List[dict], k: int = 3) -> dict:
         """
         Perform K-Fold Cross Validation
 
         Args:
             data: List of records
-            k: Number of folds (default: 5)
+            k: Number of folds (default: 3)
 
         Returns:
-            dict: K-Fold results with scores per fold
+            dict: Results for each fold and average metrics
         """
         logger.info(f"[K-FOLD] Starting {k}-Fold Cross Validation with {len(data)} samples")
 
-        # Shuffle data
-        import random
-        random.seed(42)
-        shuffled_data = data.copy()
-        random.shuffle(shuffled_data)
+        # Shuffle data for randomness
+        np.random.seed(42)  # For reproducibility
+        shuffled_data = np.array(data)
+        np.random.shuffle(shuffled_data)
 
-        # Calculate fold size
+        # Split data into k folds
         fold_size = len(shuffled_data) // k
-        fold_scores = []
+        folds = []
 
         for i in range(k):
-            # Split data into train and test
             start_idx = i * fold_size
-            end_idx = start_idx + fold_size if i < k - 1 else len(shuffled_data)
+            if i == k - 1:  # Last fold gets remaining data
+                end_idx = len(shuffled_data)
+            else:
+                end_idx = (i + 1) * fold_size
+            folds.append(shuffled_data[start_idx:end_idx])
 
-            test_fold = shuffled_data[start_idx:end_idx]
+        logger.info(f"[K-FOLD] Data split into {k} folds of sizes: {[len(f) for f in folds]}")
 
-            # Calculate accuracy for this fold
-            correct = 0
-            for record in test_fold:
-                actual = record.get('is_legal', 1)
-                predicted = self.predict(record)
-                if actual == predicted:
-                    correct += 1
+        # Perform k-fold validation
+        fold_results = []
 
-            accuracy = correct / len(test_fold) if len(test_fold) > 0 else 0
-            fold_scores.append(round(accuracy, 3))
+        for fold_idx in range(k):
+            # Use fold_idx as test set
+            test_fold = folds[fold_idx].tolist()
 
-            logger.info(f"[K-FOLD] Fold {i+1}/{k}: Accuracy = {accuracy:.3f}")
+            logger.info(f"[K-FOLD] Fold {fold_idx + 1}/{k}: Testing on {len(test_fold)} samples")
 
-        mean_accuracy = np.mean(fold_scores)
-        std_deviation = np.std(fold_scores)
+            # Calculate confusion matrix for this fold
+            confusion_matrix = self.calculate_confusion_matrix(test_fold)
 
-        logger.info(f"[K-FOLD] Mean Accuracy = {mean_accuracy:.3f}, Std Dev = {std_deviation:.3f}")
+            # Calculate metrics for this fold
+            metrics = self.calculate_metrics(confusion_matrix)
+
+            fold_result = {
+                'fold': fold_idx + 1,
+                'test_size': len(test_fold),
+                'tp': confusion_matrix['true_positive'],
+                'tn': confusion_matrix['true_negative'],
+                'fp': confusion_matrix['false_positive'],
+                'fn': confusion_matrix['false_negative'],
+                'accuracy': metrics['accuracy'],
+                'precision': metrics['precision'],
+                'recall': metrics['recall'],
+                'f1_score': metrics['f1_score']
+            }
+
+            fold_results.append(fold_result)
+            logger.info(f"[K-FOLD] Fold {fold_idx + 1} - Accuracy: {metrics['accuracy']:.3f}, F1: {metrics['f1_score']:.3f}")
+
+        # Calculate average metrics
+        avg_accuracy = np.mean([f['accuracy'] for f in fold_results])
+        avg_precision = np.mean([f['precision'] for f in fold_results])
+        avg_recall = np.mean([f['recall'] for f in fold_results])
+        avg_f1_score = np.mean([f['f1_score'] for f in fold_results])
+
+        # Calculate standard deviation
+        std_accuracy = np.std([f['accuracy'] for f in fold_results])
+        std_f1_score = np.std([f['f1_score'] for f in fold_results])
+
+        logger.info(f"[K-FOLD] Average Accuracy: {avg_accuracy:.3f} (±{std_accuracy:.3f})")
+        logger.info(f"[K-FOLD] Average F1-Score: {avg_f1_score:.3f} (±{std_f1_score:.3f})")
 
         return {
             'k': k,
-            'fold_scores': fold_scores,
-            'mean_accuracy': round(mean_accuracy, 3),
-            'std_deviation': round(std_deviation, 3)
-        }
-
-
-    def get_full_evaluation(self, data: List[dict]) -> Dict:
-        """
-        Get complete evaluation metrics
-
-        Args:
-            data: List of records
-
-        Returns:
-            dict: Complete evaluation including confusion matrix, metrics, and k-fold
-        """
-        logger.info(f"[EVALUATION] Starting full evaluation with {len(data)} samples")
-
-        # Calculate confusion matrix
-        confusion_matrix = self.calculate_confusion_matrix(data)
-
-        # Calculate metrics
-        metrics = self.calculate_metrics(confusion_matrix)
-
-        # Perform K-Fold Cross Validation
-        k_fold_results = self.k_fold_cross_validation(data, k=5)
-
-        # Count labels
-        legal_count = sum(1 for record in data if record.get('is_legal') == 1)
-        illegal_count = len(data) - legal_count
-
-        # Add interpretation
-        interpretation = self.get_interpretation(metrics, k_fold_results)
-
-        result = {
             'total_samples': len(data),
-            'legal_count': legal_count,
-            'illegal_count': illegal_count,
-            'confusion_matrix': confusion_matrix,
-            'metrics': metrics,
-            'k_fold_results': k_fold_results,
-            'interpretation': interpretation
-        }
-
-        logger.info("[EVALUATION] Full evaluation completed successfully")
-
-        return result
-
-
-    def get_interpretation(self, metrics: Dict, k_fold_results: Dict) -> Dict:
-        """
-        Generate human-readable interpretation of results
-
-        Args:
-            metrics: Evaluation metrics
-            k_fold_results: K-Fold results
-
-        Returns:
-            dict: Interpretation summary
-        """
-        accuracy = metrics['accuracy']
-        precision = metrics['precision']
-        recall = metrics['recall']
-        f1_score = metrics['f1_score']
-        std_dev = k_fold_results['std_deviation']
-
-        # Performance level
-        if accuracy >= 0.95:
-            performance_level = "Sangat Baik"
-        elif accuracy >= 0.85:
-            performance_level = "Baik"
-        elif accuracy >= 0.75:
-            performance_level = "Cukup"
-        else:
-            performance_level = "Kurang"
-
-        # Model stability
-        if std_dev <= 0.01:
-            stability = "Sangat Stabil"
-        elif std_dev <= 0.03:
-            stability = "Stabil"
-        elif std_dev <= 0.05:
-            stability = "Cukup Stabil"
-        else:
-            stability = "Tidak Stabil"
-
-        # Summary message
-        summary = (
-            f"Model mencapai performa {performance_level.lower()} dengan "
-            f"akurasi {accuracy*100:.1f}%. Classifier menunjukkan hasil yang {stability.lower()} "
-            f"pada validasi K-Fold (standar deviasi: {std_dev:.3f}). "
-            f"Precision sebesar {precision*100:.1f}% menunjukkan tingkat false positive yang rendah, "
-            f"sedangkan recall sebesar {recall*100:.1f}% menunjukkan deteksi kasus positif yang baik."
-        )
-
-        return {
-            'performance_level': performance_level,
-            'stability': stability,
-            'summary': summary,
-            'recommendations': self.get_recommendations(metrics)
-        }
-
-
-    def get_recommendations(self, metrics: Dict) -> List[str]:
-        """
-        Generate recommendations based on metrics
-
-        Args:
-            metrics: Evaluation metrics
-
-        Returns:
-            list: List of recommendations
-        """
-        recommendations = []
-
-        accuracy = metrics['accuracy']
-        precision = metrics['precision']
-        recall = metrics['recall']
-
-        if accuracy < 0.85:
-            recommendations.append("Pertimbangkan untuk menambah data training atau meningkatkan feature engineering")
-
-        if precision < 0.90:
-            recommendations.append("Terdeteksi tingkat false positive yang tinggi. Tinjau kembali daftar keyword ilegal")
-
-        if recall < 0.90:
-            recommendations.append("Beberapa kasus positif terlewatkan. Pertimbangkan untuk memperluas daftar keyword legal")
-
-        if abs(precision - recall) > 0.1:
-            recommendations.append("Terdapat ketidakseimbangan antara precision dan recall. Pertimbangkan untuk menyesuaikan threshold klasifikasi")
-
-        if not recommendations:
-            recommendations.append("Performa model sangat baik. Lanjutkan monitoring dengan data baru")
-
-        return recommendations
-
-
-    def predict_single(self, record: dict) -> Dict:
-        """
-        Predict single record and return detailed result
-
-        Args:
-            record: Single record dictionary
-
-        Returns:
-            dict: Prediction result with confidence and classification type
-        """
-        actual = record.get('is_legal', 1)
-        predicted = self.predict(record)
-
-        # Calculate confidence (simple heuristic)
-        text = f"{record.get('keyword', '')} {record.get('title', '')} {record.get('description', '')}".lower()
-        illegal_count = sum(1 for keyword in self.illegal_keywords if keyword in text)
-        legal_count = sum(1 for keyword in self.legal_keywords if keyword in text)
-        total_keywords = illegal_count + legal_count
-
-        if total_keywords > 0:
-            confidence = max(illegal_count, legal_count) / total_keywords
-        else:
-            confidence = 0.5  # Neutral
-
-        # Determine classification type
-        is_correct = (actual == predicted)
-
-        if actual == 1 and predicted == 1:
-            classification = "True Positive"
-        elif actual == 0 and predicted == 0:
-            classification = "True Negative"
-        elif actual == 0 and predicted == 1:
-            classification = "False Positive"
-        else:
-            classification = "False Negative"
-
-        return {
-            'predicted_label': predicted,
-            'confidence': round(confidence, 2),
-            'is_correct': is_correct,
-            'classification': classification
+            'fold_results': fold_results,
+            'average': {
+                'accuracy': round(avg_accuracy, 4),
+                'precision': round(avg_precision, 4),
+                'recall': round(avg_recall, 4),
+                'f1_score': round(avg_f1_score, 4)
+            },
+            'std_deviation': {
+                'accuracy': round(std_accuracy, 4),
+                'f1_score': round(std_f1_score, 4)
+            }
         }

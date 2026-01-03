@@ -1,4 +1,5 @@
-from flask import request, jsonify
+from flask import request, jsonify, Response
+import json
 from dataclasses import asdict
 from backend.controller.advices.BaseControllerImpl import BaseControllerImpl
 from backend.controller.v1.TugasAkhirControllerV1 import TugasAkhirControllerV1
@@ -7,6 +8,11 @@ from backend.request.v1.ScrapeSerperRequestV1 import ScrapeSerperRequestV1
 from backend.request.v1.ListDatasetRequestV1 import ListDatasetRequestV1
 from backend.request.v1.SearchDatasetRequestV1 import SearchDatasetRequestV1
 from backend.request.v1.GetDatasetByLinkRequestV1 import GetDatasetByLinkRequestV1
+from backend.request.v1.ConfusionMatrixRequestV1 import ConfusionMatrixRequestV1
+from backend.request.v1.KFoldCrossValidationRequestV1 import KFoldCrossValidationRequestV1
+from backend.request.v1.EpochEarlyStoppingRequestV1 import EpochEarlyStoppingRequestV1
+from backend.request.v1.BatchSizeRequestV1 import BatchSizeRequestV1
+from backend.request.v1.OptimizerRequestV1 import OptimizerRequestV1
 
 
 from backend.utils.ResponseHelper import ResponseHelper
@@ -146,3 +152,266 @@ class TugasAkhirControllerImplV1(TugasAkhirControllerV1):
         )
 
         return final_response
+
+    def getConfusionMatrix(self, validation_request: ConfusionMatrixRequestV1):
+        """
+        Get Confusion Matrix and Evaluation Metrics
+
+        Endpoint: POST /api/v1/confusion-matrix
+        """
+        try:
+            service_response = self.service.getConfusionMatrix(validation_request)
+
+            # Use json.dumps with sort_keys=False to maintain dict field order
+            response_data = {
+                "success": True,
+                "message": None,
+                "data": service_response,
+                "errors": None
+            }
+
+            json_string = json.dumps(response_data, ensure_ascii=False, sort_keys=False)
+            return Response(json_string, mimetype='application/json')
+        except FileNotFoundError as fnf:
+            return jsonify({
+                "success": False,
+                "message": "Dataset file not found",
+                "data": None,
+                "errors": [{
+                    "code": "FILE_NOT_FOUND",
+                    "title": "Dataset File Not Found",
+                    "message": "The merged dataset CSV file could not be found. Please ensure the data has been crawled and merged."
+                }]
+            }), 404
+        except ValueError as ve:
+            return jsonify({
+                "success": False,
+                "message": "Invalid request parameters",
+                "data": None,
+                "errors": [{
+                    "code": "INVALID_PARAMETERS",
+                    "title": "Invalid Parameters",
+                    "message": str(ve)
+                }]
+            }), 400
+        except Exception as e:
+            return jsonify({
+                "success": False,
+                "message": "Confusion Matrix calculation failed",
+                "data": None,
+                "errors": [{
+                    "code": "CONFUSION_MATRIX_ERROR",
+                    "title": "Confusion Matrix Error",
+                    "message": str(e)
+                }]
+            }), 500
+
+
+    def getKFoldCrossValidation(self, validation_request: KFoldCrossValidationRequestV1):
+        """
+        Get K-Fold Cross Validation with k=3 and k=5
+
+        Endpoint: POST /api/v1/k-fold-cross-validation
+        """
+        try:
+            service_response = self.service.getKFoldCrossValidation(validation_request)
+
+            # Use json.dumps with sort_keys=False to maintain dict field order
+            response_data = {
+                "success": True,
+                "message": None,
+                "data": service_response,
+                "errors": None
+            }
+
+            json_string = json.dumps(response_data, ensure_ascii=False, sort_keys=False)
+            return Response(json_string, mimetype='application/json')
+        except FileNotFoundError as fnf:
+            return jsonify({
+                "success": False,
+                "message": "Dataset file not found",
+                "data": None,
+                "errors": [{
+                    "code": "FILE_NOT_FOUND",
+                    "title": "Dataset File Not Found",
+                    "message": "The merged dataset CSV file could not be found. Please ensure the data has been crawled and merged."
+                }]
+            }), 404
+        except ValueError as ve:
+            return jsonify({
+                "success": False,
+                "message": "Invalid request parameters",
+                "data": None,
+                "errors": [{
+                    "code": "INVALID_PARAMETERS",
+                    "title": "Invalid Parameters",
+                    "message": str(ve)
+                }]
+            }), 400
+        except Exception as e:
+            return jsonify({
+                "success": False,
+                "message": "K-Fold Cross Validation failed",
+                "data": None,
+                "errors": [{
+                    "code": "K_FOLD_ERROR",
+                    "title": "K-Fold Cross Validation Error",
+                    "message": str(e)
+                }]
+            }), 500
+
+    def getEpochEarlyStopping(self, validation_request: EpochEarlyStoppingRequestV1) -> Response:
+        """
+        Simulate training with Epoch and Early Stopping mechanism
+
+        Endpoint: POST /api/v1/epoch-early-stopping
+        """
+        try:
+            # Call service
+            result = self.service.getEpochEarlyStopping(validation_request)
+
+            # Return success response
+            return jsonify({
+                "success": True,
+                "message": None,
+                "data": result,
+                "errors": None
+            })
+
+        except FileNotFoundError as fnfe:
+            return jsonify({
+                "success": False,
+                "message": "Dataset file not found",
+                "data": None,
+                "errors": [{
+                    "code": "FILE_NOT_FOUND",
+                    "title": "Dataset File Not Found",
+                    "message": str(fnfe)
+                }]
+            }), 404
+        except ValueError as ve:
+            return jsonify({
+                "success": False,
+                "message": "Invalid request parameters",
+                "data": None,
+                "errors": [{
+                    "code": "INVALID_PARAMETERS",
+                    "title": "Invalid Parameters",
+                    "message": str(ve)
+                }]
+            }), 400
+        except Exception as e:
+            return jsonify({
+                "success": False,
+                "message": "Epoch training simulation failed",
+                "data": None,
+                "errors": [{
+                    "code": "EPOCH_TRAINING_ERROR",
+                    "title": "Epoch Training Error",
+                    "message": str(e)
+                }]
+            }), 500
+
+    def getBatchSize(self, validation_request: BatchSizeRequestV1) -> Response:
+        """
+        Calculate Batch Size analysis for training optimization
+
+        Endpoint: POST /api/v1/batch-size
+        """
+        try:
+            # Call service
+            result = self.service.getBatchSize(validation_request)
+
+            # Return success response
+            return jsonify({
+                "success": True,
+                "message": None,
+                "data": result,
+                "errors": None
+            })
+
+        except FileNotFoundError as fnfe:
+            return jsonify({
+                "success": False,
+                "message": "Dataset file not found",
+                "data": None,
+                "errors": [{
+                    "code": "FILE_NOT_FOUND",
+                    "title": "Dataset File Not Found",
+                    "message": str(fnfe)
+                }]
+            }), 404
+        except ValueError as ve:
+            return jsonify({
+                "success": False,
+                "message": "Invalid request parameters",
+                "data": None,
+                "errors": [{
+                    "code": "INVALID_PARAMETERS",
+                    "title": "Invalid Parameters",
+                    "message": str(ve)
+                }]
+            }), 400
+        except Exception as e:
+            return jsonify({
+                "success": False,
+                "message": "Batch size calculation failed",
+                "data": None,
+                "errors": [{
+                    "code": "BATCH_SIZE_ERROR",
+                    "title": "Batch Size Error",
+                    "message": str(e)
+                }]
+            }), 500
+
+    def getOptimizer(self, validation_request: OptimizerRequestV1) -> Response:
+        """
+        Compare different optimizers (SGD, RMSprop, Adam)
+
+        Endpoint: POST /api/v1/optimizer
+        """
+        try:
+            # Call service
+            result = self.service.getOptimizer(validation_request)
+
+            # Return success response
+            return jsonify({
+                "success": True,
+                "message": None,
+                "data": result,
+                "errors": None
+            })
+
+        except FileNotFoundError as fnfe:
+            return jsonify({
+                "success": False,
+                "message": "Dataset file not found",
+                "data": None,
+                "errors": [{
+                    "code": "FILE_NOT_FOUND",
+                    "title": "Dataset File Not Found",
+                    "message": str(fnfe)
+                }]
+            }), 404
+        except ValueError as ve:
+            return jsonify({
+                "success": False,
+                "message": "Invalid request parameters",
+                "data": None,
+                "errors": [{
+                    "code": "INVALID_PARAMETERS",
+                    "title": "Invalid Parameters",
+                    "message": str(ve)
+                }]
+            }), 400
+        except Exception as e:
+            return jsonify({
+                "success": False,
+                "message": "Optimizer comparison failed",
+                "data": None,
+                "errors": [{
+                    "code": "OPTIMIZER_ERROR",
+                    "title": "Optimizer Error",
+                    "message": str(e)
+                }]
+            }), 500

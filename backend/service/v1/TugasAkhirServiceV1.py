@@ -5,6 +5,11 @@ from backend.request.v1.ListDatasetRequestV1 import ListDatasetRequestV1
 from backend.request.v1.SearchDatasetRequestV1 import SearchDatasetRequestV1
 from backend.response.v1.ListDatasetResponseV1 import ListDatasetResponseV1
 from backend.response.v1.DetailDatasetResponseV1 import DetailDatasetResponseV1
+from backend.request.v1.ConfusionMatrixRequestV1 import ConfusionMatrixRequestV1
+from backend.request.v1.KFoldCrossValidationRequestV1 import KFoldCrossValidationRequestV1
+from backend.request.v1.EpochEarlyStoppingRequestV1 import EpochEarlyStoppingRequestV1
+from backend.request.v1.BatchSizeRequestV1 import BatchSizeRequestV1
+from backend.request.v1.OptimizerRequestV1 import OptimizerRequestV1
 
 class TugasAkhirServiceV1(ABC):
 
@@ -26,4 +31,24 @@ class TugasAkhirServiceV1(ABC):
 
     @abstractmethod
     def searchDataset(self, request: SearchDatasetRequestV1) -> dict:
+        pass
+
+    @abstractmethod
+    def getConfusionMatrix(self, request: ConfusionMatrixRequestV1) -> dict:
+        pass
+
+    @abstractmethod
+    def getKFoldCrossValidation(self, request: KFoldCrossValidationRequestV1) -> dict:
+        pass
+
+    @abstractmethod
+    def getEpochEarlyStopping(self, request: EpochEarlyStoppingRequestV1) -> dict:
+        pass
+
+    @abstractmethod
+    def getBatchSize(self, request: BatchSizeRequestV1) -> dict:
+        pass
+
+    @abstractmethod
+    def getOptimizer(self, request: OptimizerRequestV1) -> dict:
         pass
