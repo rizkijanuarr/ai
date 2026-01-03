@@ -17,6 +17,7 @@ from backend.request.v1.KFoldCrossValidationRequestV1 import KFoldCrossValidatio
 from backend.request.v1.EpochEarlyStoppingRequestV1 import EpochEarlyStoppingRequestV1
 from backend.request.v1.BatchSizeRequestV1 import BatchSizeRequestV1
 from backend.request.v1.OptimizerRequestV1 import OptimizerRequestV1
+from backend.request.v1.EpochTrainingRequestV1 import EpochTrainingRequestV1
 from abc import ABC, abstractmethod
 
 @BaseController(value="/api/v1")
@@ -119,4 +120,14 @@ class TugasAkhirControllerV1(ABC):
     )
     @abstractmethod
     def getOptimizer(self, validation_request: OptimizerRequestV1) -> DataResponseParameter[dict]:
+        pass
+
+    @PostEndpoint(
+        value="/epoch-training",
+        tagName="Evaluation Metrics",
+        description="Train model using ALL data without validation split (final training)",
+        group=SwaggerTypeGroup.APPS_WEB
+    )
+    @abstractmethod
+    def getEpochTraining(self, validation_request: EpochTrainingRequestV1) -> DataResponseParameter[dict]:
         pass

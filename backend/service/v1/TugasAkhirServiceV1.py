@@ -10,6 +10,7 @@ from backend.request.v1.KFoldCrossValidationRequestV1 import KFoldCrossValidatio
 from backend.request.v1.EpochEarlyStoppingRequestV1 import EpochEarlyStoppingRequestV1
 from backend.request.v1.BatchSizeRequestV1 import BatchSizeRequestV1
 from backend.request.v1.OptimizerRequestV1 import OptimizerRequestV1
+from backend.request.v1.EpochTrainingRequestV1 import EpochTrainingRequestV1
 
 class TugasAkhirServiceV1(ABC):
 
@@ -51,4 +52,8 @@ class TugasAkhirServiceV1(ABC):
 
     @abstractmethod
     def getOptimizer(self, request: OptimizerRequestV1) -> dict:
+        pass
+
+    @abstractmethod
+    def getEpochTraining(self, request: EpochTrainingRequestV1) -> dict:
         pass

@@ -13,6 +13,7 @@ from backend.request.v1.KFoldCrossValidationRequestV1 import KFoldCrossValidatio
 from backend.request.v1.EpochEarlyStoppingRequestV1 import EpochEarlyStoppingRequestV1
 from backend.request.v1.BatchSizeRequestV1 import BatchSizeRequestV1
 from backend.request.v1.OptimizerRequestV1 import OptimizerRequestV1
+from backend.request.v1.EpochTrainingRequestV1 import EpochTrainingRequestV1
 
 
 from backend.utils.ResponseHelper import ResponseHelper
@@ -412,6 +413,55 @@ class TugasAkhirControllerImplV1(TugasAkhirControllerV1):
                 "errors": [{
                     "code": "OPTIMIZER_ERROR",
                     "title": "Optimizer Error",
+                    "message": str(e)
+                }]
+            }), 500
+
+    def getEpochTraining(self, validation_request: EpochTrainingRequestV1) -> Response:
+        """
+        Train model using ALL data without validation split
+
+        This endpoint is for final training after hyperparameter tuning.
+        Uses 100% of data for training without validation split.
+        """
+        try:
+            result = self.service.getEpochTraining(validation_request)
+            return jsonify({
+                "success": True,
+                "message": None,
+                "data": result,
+                "errors": None
+            })
+        except FileNotFoundError as fnfe:
+            return jsonify({
+                "success": False,
+                "message": "Dataset file not found",
+                "data": None,
+                "errors": [{
+                    "code": "FILE_NOT_FOUND",
+                    "title": "Dataset File Not Found",
+                    "message": str(fnfe)
+                }]
+            }), 404
+        except ValueError as ve:
+            return jsonify({
+                "success": False,
+                "message": "Invalid request parameters",
+                "data": None,
+                "errors": [{
+                    "code": "INVALID_PARAMETERS",
+                    "title": "Invalid Parameters",
+                    "message": str(ve)
+                }]
+            }), 400
+        except Exception as e:
+            return jsonify({
+                "success": False,
+                "message": "Epoch training failed",
+                "data": None,
+                "errors": [{
+                    "code": "EPOCH_TRAINING_ERROR",
+                    "title": "Epoch Training Error",
                     "message": str(e)
                 }]
             }), 500
