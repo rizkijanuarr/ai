@@ -39,7 +39,7 @@ class TugasAkhirControllerV1(ABC):
         group=SwaggerTypeGroup.APPS_WEB
     )
     @abstractmethod
-    def getListDataset(self, validation_request: ListDatasetRequestV1) -> SliceResponseParameter[ListDatasetResponseV1]:
+    def getListDataset(self) -> SliceResponseParameter[ListDatasetResponseV1]:
         pass
 
     @GetEndpoint(

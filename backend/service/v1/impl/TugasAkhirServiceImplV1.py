@@ -248,10 +248,10 @@ class TugasAkhirServiceImplV1(TugasAkhirServiceV1):
             filter_msg = f" (filtered: {'legal' if request.is_legal == 1 else 'illegal'} only)"
 
         # Get confusion matrix values
-        tp = confusion_matrix['true_positive']
-        tn = confusion_matrix['true_negative']
-        fp = confusion_matrix['false_positive']
-        fn = confusion_matrix['false_negative']
+        tp = confusion_matrix['tp']
+        tn = confusion_matrix['tn']
+        fp = confusion_matrix['fp']
+        fn = confusion_matrix['fn']
 
         # Get metrics
         acc = metrics['accuracy']

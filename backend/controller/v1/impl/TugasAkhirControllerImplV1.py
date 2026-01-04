@@ -45,7 +45,28 @@ class TugasAkhirControllerImplV1(TugasAkhirControllerV1):
             }), 500
 
 
-    def getListDataset(self, validation_request: ListDatasetRequestV1):
+    def getListDataset(self):
+        # Get query parameters from request
+        from flask import request
+
+        # Create request object from query params
+        try:
+            is_legal = int(request.args.get('is_legal', 1))
+            limit_data = int(request.args.get('limit_data', 10))
+            page = int(request.args.get('page', 1))
+
+            # Create validation request
+            validation_request = ListDatasetRequestV1(
+                is_legal=is_legal,
+                limit_data=limit_data,
+                page=page
+            )
+        except (ValueError, TypeError) as e:
+            return ResponseHelper.create_error_response(
+                message="Invalid query parameters",
+                errors=[{"code": 400, "message": str(e), "title": "Validation Error"}]
+            ), 400
+
         service_response = self.service.getListDataset(validation_request)
         data = service_response['data']
         total_data = service_response.get('total_data')
