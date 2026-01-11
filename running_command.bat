@@ -36,7 +36,7 @@ python -m pip install --upgrade pip
 REM 4. Install Backend Dependencies
 if exist "requirements.txt" (
     echo [INFO] Installing backend dependencies...
-    pip install -r requirements.txt
+    python -m pip install -r requirements.txt
 ) else (
     echo [ERROR] requirements.txt not found!
     exit /b 1

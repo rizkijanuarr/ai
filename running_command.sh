@@ -25,12 +25,12 @@ source venv/bin/activate
 
 # 3. Upgrade pip (Best Practice)
 echo "[INFO] Checking pip version..."
-pip install --upgrade pip
+python -m pip install --upgrade pip
 
 # 4. Install Backend Dependencies
 if [ -f "requirements.txt" ]; then
     echo "[INFO] Installing backend dependencies..."
-    pip install -r requirements.txt
+    python -m pip install -r requirements.txt
 else
     echo "[ERROR] requirements.txt not found!"
     exit 1
