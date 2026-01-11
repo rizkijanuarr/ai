@@ -37,8 +37,13 @@ else
 fi
 
 # 5. Install Frontend Dependencies
-echo "[INFO] Installing frontend dependencies..."
+echo "[INFO] Cleaning frontend cache..."
 cd frontend
+rm -rf node_modules
+rm -rf .next
+rm -f package-lock.json
+
+echo "[INFO] Installing frontend dependencies..."
 npm install
 cd ..
 

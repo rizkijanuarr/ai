@@ -43,8 +43,13 @@ if exist "requirements.txt" (
 )
 
 REM 5. Install Frontend Dependencies
-echo [INFO] Installing frontend dependencies...
+echo [INFO] Cleaning frontend cache...
 cd frontend
+if exist "node_modules" rd /s /q node_modules
+if exist ".next" rd /s /q .next
+if exist "package-lock.json" del /f package-lock.json
+
+echo [INFO] Installing frontend dependencies...
 call npm install
 cd ..
 
