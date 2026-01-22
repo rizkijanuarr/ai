@@ -5,10 +5,10 @@ from flask_cors import CORS
 # Initialize Flask app as pure API server
 app = Flask(__name__)
 
-# Enable CORS for Next.js frontend (running on port 3000)
+# Enable CORS for all origins (needed for Ngrok public access)
 CORS(app, resources={
     r"/api/*": {
-        "origins": ["http://localhost:3000", "http://127.0.0.1:3000"],
+        "origins": "*",  # Allow all domains (including Ngrok)
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"],
         "supports_credentials": True

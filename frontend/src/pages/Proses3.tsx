@@ -1,7 +1,6 @@
-"use client";
 
 import { useState, useEffect } from "react";
-import { Navbar } from "@/components/navbar";
+import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -205,7 +204,7 @@ export default function Proses3Page() {
                       <Tooltip
                         contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }}
                         labelStyle={{ color: '#94a3b8' }}
-                        formatter={(value: number) => formatPercent(value)}
+                        formatter={(value: any) => formatPercent(value as number)}
                       />
                       <Legend />
                       <Line
@@ -243,7 +242,7 @@ export default function Proses3Page() {
                       <Tooltip
                         contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155' }}
                         labelStyle={{ color: '#94a3b8' }}
-                        formatter={(value: number) => value.toFixed(4)}
+                        formatter={(value: any) => (value as number).toFixed(4)}
                       />
                       <Legend />
                       <Line

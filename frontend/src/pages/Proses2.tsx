@@ -1,8 +1,6 @@
-"use client";
 
 import { useState, useEffect } from "react";
-import { Navbar } from "@/components/navbar";
-import { Badge } from "@/components/ui/badge";
+import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
