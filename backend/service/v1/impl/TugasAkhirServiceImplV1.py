@@ -6,10 +6,14 @@ from backend.request.v1.ListDatasetRequestV1 import ListDatasetRequestV1
 from backend.response.v1.ListDatasetResponseV1 import ListDatasetResponseV1
 from backend.response.v1.DetailDatasetResponseV1 import DetailDatasetResponseV1
 from backend.request.v1.ConfusionMatrixRequestV1 import ConfusionMatrixRequestV1
+from backend.response.v1.ConfusionMatrixResponseV1 import ConfusionMatrixResponseV1
 from backend.request.v1.KFoldCrossValidationRequestV1 import KFoldCrossValidationRequestV1
 from backend.request.v1.EpochEarlyStoppingRequestV1 import EpochEarlyStoppingRequestV1
+from backend.response.v1.EpochEarlyStoppingResponseV1 import EpochEarlyStoppingResponseV1
 from backend.request.v1.BatchSizeRequestV1 import BatchSizeRequestV1
+from backend.response.v1.BatchSizeResponseV1 import BatchSizeResponseV1
 from backend.request.v1.OptimizerRequestV1 import OptimizerRequestV1
+from backend.response.v1.OptimizerResponseV1 import OptimizerResponseV1
 from backend.request.v1.EpochTrainingRequestV1 import EpochTrainingRequestV1
 from backend.service.v1.EvaluationServiceV1 import EvaluationServiceV1
 
