@@ -334,7 +334,7 @@ export default function Proses5Page() {
             </Card>
 
             {/* Penjelasan */}
-            <Card className="bg-slate-900 border-slate-800">
+            <Card className="bg-slate-900 border-slate-800 mb-8">
               <CardHeader>
                 <CardTitle className="text-white">Penjelasan</CardTitle>
               </CardHeader>
@@ -363,13 +363,422 @@ export default function Proses5Page() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Detailed Explanation Section - DYNAMIC */}
+            <div className="mb-12">
+              <h2 className="text-3xl font-bold text-white mb-6 text-center">
+                📚 Penjelasan Detail Optimizer Comparison
+              </h2>
+
+              {/* What is Optimizer */}
+              <Card className="bg-slate-900 border-slate-800 mb-6">
+                <CardHeader>
+                  <CardTitle className="text-white text-xl">🎯 Apa itu Optimizer?</CardTitle>
+                  <CardDescription>Konsep dasar optimizer dalam machine learning</CardDescription>
+                </CardHeader>
+                <CardContent className="text-slate-300 space-y-4">
+                  <p className="text-sm leading-relaxed">
+                    <span className="font-bold text-white">Optimizer</span> adalah algoritma yang mengatur bagaimana model neural network belajar dengan mengupdate weights berdasarkan gradient.
+                    Dataset dengan <span className="font-bold text-white">{data.total_samples.toLocaleString()} samples</span> digunakan untuk membandingkan performa {data.optimizer_results.length} optimizer berbeda.
+                  </p>
+
+                  <div className="bg-slate-800 p-4 rounded-lg">
+                    <p className="font-semibold text-white mb-2">Analogi Sederhana:</p>
+                    <p className="text-sm">
+                      Bayangkan mencari jalan turun gunung dalam kabut. <span className="text-blue-400 font-semibold">Optimizer = Strategi turun gunung</span>.
+                      SGD (jalan pelan-pelan) = stabil tapi lambat. RMSprop (sesuaikan kecepatan) = adaptif.
+                      Adam (kombinasi terbaik) = <span className="text-green-400 font-semibold">cepat dan stabil</span>.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                    <div className="bg-blue-900/20 border border-blue-800 p-4 rounded">
+                      <h4 className="font-bold text-blue-400 mb-2">📊 Dataset Info</h4>
+                      <p className="text-sm mb-2">Total: <span className="font-bold text-white">{data.total_samples.toLocaleString()}</span></p>
+                      <p className="text-xs text-slate-400">{data.keterangan_legal}</p>
+                    </div>
+
+                    <div className="bg-green-900/20 border border-green-800 p-4 rounded">
+                      <h4 className="font-bold text-green-400 mb-2">✅ Recommended</h4>
+                      <p className="text-sm mb-2">Optimizer: <span className="font-bold text-white">{data.comparison.recommended.optimizer}</span></p>
+                      <p className="text-xs text-slate-400">{data.comparison.recommended.epochs_to_converge} epochs to converge</p>
+                    </div>
+
+                    <div className="bg-orange-900/20 border border-orange-800 p-4 rounded">
+                      <h4 className="font-bold text-orange-400 mb-2">🔢 Tested Optimizers</h4>
+                      <p className="text-sm mb-2">Count: <span className="font-bold text-white">{data.optimizer_results.length}</span></p>
+                      <p className="text-xs text-slate-400">
+                        {data.optimizer_results.map(o => o.optimizer).join(', ')}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* How Optimizer Works */}
+              <Card className="bg-slate-900 border-slate-800 mb-6">
+                <CardHeader>
+                  <CardTitle className="text-white text-xl">🔄 Cara Kerja Optimizer Comparison</CardTitle>
+                  <CardDescription>Proses step-by-step dengan data {data.keterangan_legal}</CardDescription>
+                </CardHeader>
+                <CardContent className="text-slate-300 space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">1</div>
+                      <div>
+                        <p className="font-semibold text-white">Initialize Model</p>
+                        <p className="text-sm">Model neural network diinisialisasi dengan random weights untuk dataset <span className="font-bold text-white">{data.total_samples.toLocaleString()} samples</span></p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <div className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">2</div>
+                      <div>
+                        <p className="font-semibold text-white">Train with Each Optimizer</p>
+                        <p className="text-sm">Setiap optimizer diuji dengan learning rate yang optimal:</p>
+                        <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-2">
+                          {data.optimizer_results.map((opt) => (
+                            <div key={opt.optimizer} className="bg-slate-800 p-2 rounded text-xs">
+                              <p className="font-semibold text-white">{opt.optimizer}:</p>
+                              <p className="text-blue-400">LR: {opt.learning_rate}</p>
+                              <p className="text-green-400">Epochs: {opt.epochs_to_converge}</p>
+                              <p className="text-slate-400">Accuracy: {formatPercent(opt.final_accuracy)}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <div className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">3</div>
+                      <div>
+                        <p className="font-semibold text-white">Measure Performance</p>
+                        <p className="text-sm">Untuk setiap optimizer, ukur:</p>
+                        <ul className="list-disc list-inside mt-2 ml-4 space-y-1 text-sm">
+                          <li>Epochs to Converge (kecepatan)</li>
+                          <li>Final Accuracy (kualitas)</li>
+                          <li>Convergence Speed (fast/moderate/slow)</li>
+                          <li>Stability (high/moderate/low)</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <div className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">4</div>
+                      <div>
+                        <p className="font-semibold text-white">Compare Results</p>
+                        <p className="text-sm">Analisis trade-offs untuk setiap optimizer:</p>
+                        <div className="mt-2 space-y-2">
+                          {data.optimizer_results.map((opt) => {
+                            const isRecommended = opt.optimizer === data.comparison.recommended.optimizer;
+                            return (
+                              <div key={opt.optimizer} className={`p-2 rounded text-xs ${isRecommended ? 'bg-green-900/30 border border-green-700' : 'bg-slate-800'}`}>
+                                <p className="font-semibold text-white">
+                                  {opt.optimizer} {isRecommended && '⭐'}
+                                </p>
+                                <p className="text-green-400">Speed: {opt.convergence_speed}</p>
+                                <p className="text-blue-400">Stability: {opt.stability}</p>
+                                <p className="text-purple-400">Accuracy: {formatPercent(opt.final_accuracy)}</p>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Optimizer Formulas and Characteristics */}
+              <Card className="bg-slate-900 border-slate-800 mb-6">
+                <CardHeader>
+                  <CardTitle className="text-white text-xl">🧮 Karakteristik dan Formula Optimizer</CardTitle>
+                  <CardDescription>Detail algoritma dengan data aktual {data.keterangan_legal}</CardDescription>
+                </CardHeader>
+                <CardContent className="text-slate-300 space-y-6">
+                  {/* SGD */}
+                  {data.optimizer_results.find(o => o.optimizer === 'SGD') && (
+                    <div className="border-l-4 border-orange-500 pl-4">
+                      <h3 className="text-lg font-bold text-white mb-2">1. SGD (Stochastic Gradient Descent)</h3>
+                      <div className="bg-slate-800 p-4 rounded mb-3 font-mono text-sm">
+                        w = w - learning_rate × gradient
+                      </div>
+                      <p className="text-sm mb-2"><span className="font-semibold text-white">Arti:</span> Update weight dengan gradient dikalikan learning rate</p>
+
+                      {(() => {
+                        const sgd = data.optimizer_results.find(o => o.optimizer === 'SGD')!;
+                        return (
+                          <div className="bg-slate-800 p-3 rounded text-sm mt-3">
+                            <p className="font-semibold text-white mb-2">Hasil untuk Dataset Ini:</p>
+                            <div className="grid grid-cols-2 gap-3 text-xs">
+                              <div>
+                                <p className="text-slate-400">Learning Rate:</p>
+                                <p className="text-blue-400 font-bold">{sgd.learning_rate}</p>
+                              </div>
+                              <div>
+                                <p className="text-slate-400">Epochs to Converge:</p>
+                                <p className="text-orange-400 font-bold">{sgd.epochs_to_converge}</p>
+                              </div>
+                              <div>
+                                <p className="text-slate-400">Final Accuracy:</p>
+                                <p className="text-green-400 font-bold">{formatPercent(sgd.final_accuracy)}</p>
+                              </div>
+                              <div>
+                                <p className="text-slate-400">Convergence Speed:</p>
+                                <p className="text-yellow-400 font-bold">{sgd.convergence_speed}</p>
+                              </div>
+                            </div>
+                            <div className="mt-3 pt-3 border-t border-slate-700">
+                              <p className="font-semibold text-white mb-2">Karakteristik:</p>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                <div>
+                                  <p className="text-green-400 text-xs mb-1">✅ Pros:</p>
+                                  <ul className="text-xs space-y-1">
+                                    {sgd.characteristics.pros.map((pro, idx) => (
+                                      <li key={idx} className="text-slate-300">• {pro}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                                <div>
+                                  <p className="text-red-400 text-xs mb-1">❌ Cons:</p>
+                                  <ul className="text-xs space-y-1">
+                                    {sgd.characteristics.cons.map((con, idx) => (
+                                      <li key={idx} className="text-slate-300">• {con}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  )}
+
+                  {/* RMSprop */}
+                  {data.optimizer_results.find(o => o.optimizer === 'RMSprop') && (
+                    <div className="border-l-4 border-yellow-500 pl-4">
+                      <h3 className="text-lg font-bold text-white mb-2">2. RMSprop (Root Mean Square Propagation)</h3>
+                      <div className="bg-slate-800 p-4 rounded mb-3 font-mono text-sm">
+                        v = β × v + (1-β) × gradient²<br/>
+                        w = w - learning_rate × gradient / √(v + ε)
+                      </div>
+                      <p className="text-sm mb-2"><span className="font-semibold text-white">Arti:</span> Adaptive learning rate berdasarkan magnitude gradient</p>
+
+                      {(() => {
+                        const rmsprop = data.optimizer_results.find(o => o.optimizer === 'RMSprop')!;
+                        return (
+                          <div className="bg-slate-800 p-3 rounded text-sm mt-3">
+                            <p className="font-semibold text-white mb-2">Hasil untuk Dataset Ini:</p>
+                            <div className="grid grid-cols-2 gap-3 text-xs">
+                              <div>
+                                <p className="text-slate-400">Learning Rate:</p>
+                                <p className="text-blue-400 font-bold">{rmsprop.learning_rate}</p>
+                              </div>
+                              <div>
+                                <p className="text-slate-400">Epochs to Converge:</p>
+                                <p className="text-yellow-400 font-bold">{rmsprop.epochs_to_converge}</p>
+                              </div>
+                              <div>
+                                <p className="text-slate-400">Final Accuracy:</p>
+                                <p className="text-green-400 font-bold">{formatPercent(rmsprop.final_accuracy)}</p>
+                              </div>
+                              <div>
+                                <p className="text-slate-400">Convergence Speed:</p>
+                                <p className="text-blue-400 font-bold">{rmsprop.convergence_speed}</p>
+                              </div>
+                            </div>
+                            <div className="mt-3 pt-3 border-t border-slate-700">
+                              <p className="font-semibold text-white mb-2">Karakteristik:</p>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                <div>
+                                  <p className="text-green-400 text-xs mb-1">✅ Pros:</p>
+                                  <ul className="text-xs space-y-1">
+                                    {rmsprop.characteristics.pros.map((pro, idx) => (
+                                      <li key={idx} className="text-slate-300">• {pro}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                                <div>
+                                  <p className="text-red-400 text-xs mb-1">❌ Cons:</p>
+                                  <ul className="text-xs space-y-1">
+                                    {rmsprop.characteristics.cons.map((con, idx) => (
+                                      <li key={idx} className="text-slate-300">• {con}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  )}
+
+                  {/* Adam */}
+                  {data.optimizer_results.find(o => o.optimizer === 'Adam') && (
+                    <div className="border-l-4 border-green-500 pl-4">
+                      <h3 className="text-lg font-bold text-white mb-2">3. Adam (Adaptive Moment Estimation)</h3>
+                      <div className="bg-slate-800 p-4 rounded mb-3 font-mono text-sm">
+                        m = β₁ × m + (1-β₁) × gradient<br/>
+                        v = β₂ × v + (1-β₂) × gradient²<br/>
+                        w = w - learning_rate × m / √(v + ε)
+                      </div>
+                      <p className="text-sm mb-2"><span className="font-semibold text-white">Arti:</span> Kombinasi momentum dan adaptive learning rate</p>
+
+                      {(() => {
+                        const adam = data.optimizer_results.find(o => o.optimizer === 'Adam')!;
+                        return (
+                          <div className="bg-slate-800 p-3 rounded text-sm mt-3">
+                            <p className="font-semibold text-white mb-2">Hasil untuk Dataset Ini:</p>
+                            <div className="grid grid-cols-2 gap-3 text-xs">
+                              <div>
+                                <p className="text-slate-400">Learning Rate:</p>
+                                <p className="text-blue-400 font-bold">{adam.learning_rate}</p>
+                              </div>
+                              <div>
+                                <p className="text-slate-400">Epochs to Converge:</p>
+                                <p className="text-green-400 font-bold">{adam.epochs_to_converge}</p>
+                              </div>
+                              <div>
+                                <p className="text-slate-400">Final Accuracy:</p>
+                                <p className="text-green-400 font-bold">{formatPercent(adam.final_accuracy)}</p>
+                              </div>
+                              <div>
+                                <p className="text-slate-400">Convergence Speed:</p>
+                                <p className="text-green-400 font-bold">{adam.convergence_speed}</p>
+                              </div>
+                            </div>
+                            <div className="mt-3 pt-3 border-t border-slate-700">
+                              <p className="font-semibold text-white mb-2">Karakteristik:</p>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                <div>
+                                  <p className="text-green-400 text-xs mb-1">✅ Pros:</p>
+                                  <ul className="text-xs space-y-1">
+                                    {adam.characteristics.pros.map((pro, idx) => (
+                                      <li key={idx} className="text-slate-300">• {pro}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                                <div>
+                                  <p className="text-red-400 text-xs mb-1">❌ Cons:</p>
+                                  <ul className="text-xs space-y-1">
+                                    {adam.characteristics.cons.map((con, idx) => (
+                                      <li key={idx} className="text-slate-300">• {con}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Interpretation Guide */}
+              <Card className="bg-gradient-to-br from-slate-900 to-slate-800 border-slate-700">
+                <CardHeader>
+                  <CardTitle className="text-white text-xl">💡 Panduan Memilih Optimizer</CardTitle>
+                  <CardDescription>Rekomendasi berdasarkan kondisi dan kebutuhan</CardDescription>
+                </CardHeader>
+                <CardContent className="text-slate-300 space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* When to use SGD */}
+                    <div className="bg-slate-800/50 p-4 rounded">
+                      <h4 className="font-bold text-orange-400 mb-2">🐢 Gunakan SGD</h4>
+                      <ul className="text-sm space-y-1 list-disc list-inside">
+                        <li>Dataset sangat besar</li>
+                        <li>Butuh generalization terbaik</li>
+                        <li>Tidak masalah training lambat</li>
+                        <li>Model sederhana</li>
+                      </ul>
+                    </div>
+
+                    {/* When to use RMSprop */}
+                    <div className="bg-slate-800/50 p-4 rounded">
+                      <h4 className="font-bold text-yellow-400 mb-2">⚡ Gunakan RMSprop</h4>
+                      <ul className="text-sm space-y-1 list-disc list-inside">
+                        <li>RNN atau LSTM</li>
+                        <li>Non-stationary problems</li>
+                        <li>Butuh adaptive learning</li>
+                        <li>Online learning</li>
+                      </ul>
+                    </div>
+
+                    {/* When to use Adam */}
+                    <div className="bg-slate-800/50 p-4 rounded">
+                      <h4 className="font-bold text-green-400 mb-2">🚀 Gunakan Adam</h4>
+                      <ul className="text-sm space-y-1 list-disc list-inside">
+                        <li>Default choice (paling umum)</li>
+                        <li>Deep neural networks</li>
+                        <li>Butuh convergence cepat</li>
+                        <li>Dataset medium-large</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Recommendation for this dataset */}
+                  <div className="bg-green-900/20 border border-green-800 p-4 rounded mt-4">
+                    <h4 className="font-bold text-green-400 mb-2">🎯 Rekomendasi untuk Dataset Ini</h4>
+                    <p className="text-sm mb-3">{data.penjelasan.recommendation}</p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                      <div className="bg-slate-800 p-3 rounded">
+                        <p className="font-semibold text-white mb-1">Dataset Info:</p>
+                        <p className="text-xs">Total: <span className="text-white font-bold">{data.total_samples.toLocaleString()}</span> samples</p>
+                        <p className="text-xs">{data.keterangan_legal}</p>
+                      </div>
+                      <div className="bg-slate-800 p-3 rounded">
+                        <p className="font-semibold text-white mb-1">Best Choice:</p>
+                        <p className="text-xs">Optimizer: <span className="text-green-400 font-bold">{data.comparison.recommended.optimizer}</span></p>
+                        <p className="text-xs">Epochs: <span className="text-blue-400 font-bold">{data.comparison.recommended.epochs_to_converge}</span></p>
+                      </div>
+                      <div className="bg-slate-800 p-3 rounded">
+                        <p className="font-semibold text-white mb-1">Performance:</p>
+                        <p className="text-xs">Speed: <span className="text-green-400 font-bold">{data.comparison.recommended.convergence_speed}</span></p>
+                        <p className="text-xs">Accuracy: <span className="text-blue-400 font-bold">{formatPercent(data.comparison.recommended.final_accuracy)}</span></p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Comparison Summary */}
+                  <div className="bg-blue-900/20 border border-blue-800 p-4 rounded mt-4">
+                    <h4 className="font-bold text-blue-400 mb-3">📊 Ringkasan Perbandingan</h4>
+                    <div className="space-y-2">
+                      {data.optimizer_results.map((opt) => {
+                        const isRecommended = opt.optimizer === data.comparison.recommended.optimizer;
+                        const isFastest = opt.epochs_to_converge === Math.min(...data.optimizer_results.map(o => o.epochs_to_converge));
+                        const isMostAccurate = opt.final_accuracy === Math.max(...data.optimizer_results.map(o => o.final_accuracy));
+
+                        return (
+                          <div key={opt.optimizer} className="flex items-center justify-between p-2 bg-slate-800 rounded text-xs">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-white">{opt.optimizer}</span>
+                              {isRecommended && <Badge className="bg-green-600 text-xs">Recommended</Badge>}
+                              {isFastest && <Badge variant="outline" className="text-blue-400 border-blue-400 text-xs">Fastest</Badge>}
+                              {isMostAccurate && <Badge variant="outline" className="text-purple-400 border-purple-400 text-xs">Most Accurate</Badge>}
+                            </div>
+                            <div className="flex items-center gap-4 text-slate-400">
+                              <span>{opt.epochs_to_converge} epochs</span>
+                              <span>{formatPercent(opt.final_accuracy)}</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </>
         ) : null}
 
         {/* Infographic Section */}
         <div className="mt-12 mb-8">
           <h2 className="text-3xl font-bold text-white mb-6 text-center">
-            📊 Penjelasan Proses Optimizer Comparison
+            📊 Infografis Proses Optimizer Comparison
           </h2>
           <div className="grid grid-cols-1 gap-8">
             <Card className="bg-slate-900 border-slate-800 overflow-hidden">
@@ -379,7 +788,7 @@ export default function Proses5Page() {
               </CardHeader>
               <CardContent>
                 <img
-                  src="/proses-5/Proses 5 - Diagram.png"
+                  src="/proses-5/Proses_5_Diagram.png"
                   alt="Proses 5 - Diagram"
                   className="w-full h-auto rounded-lg"
                 />
@@ -393,7 +802,7 @@ export default function Proses5Page() {
               </CardHeader>
               <CardContent>
                 <img
-                  src="/proses-5/Proses 5 - Penjelasan.png"
+                  src="/proses-5/Proses_5_Penjelasan.png"
                   alt="Proses 5 - Penjelasan"
                   className="w-full h-auto rounded-lg"
                 />
@@ -407,7 +816,7 @@ export default function Proses5Page() {
               </CardHeader>
               <CardContent>
                 <img
-                  src="/proses-5/Proses 5 - Penjelasan Angka.png"
+                  src="/proses-5/Proses_5_Penjelasan_Angka.png"
                   alt="Proses 5 - Penjelasan Angka"
                   className="w-full h-auto rounded-lg"
                 />
