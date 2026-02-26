@@ -366,13 +366,384 @@ export default function Proses2Page() {
                 </Card>
               </TabsContent>
             </Tabs>
+
+            {/* Detailed Explanation Section - DYNAMIC */}
+            <div className="mt-12 mb-8">
+              <h2 className="text-3xl font-bold text-white mb-6 text-center">
+                📚 Penjelasan Detail K-Fold Cross Validation
+              </h2>
+
+              {/* What is K-Fold */}
+              <Card className="bg-slate-900 border-slate-800 mb-6">
+                <CardHeader>
+                  <CardTitle className="text-white text-xl">🎯 Apa itu K-Fold Cross Validation?</CardTitle>
+                  <CardDescription>Konsep dasar dan tujuan K-Fold Cross Validation</CardDescription>
+                </CardHeader>
+                <CardContent className="text-slate-300 space-y-4">
+                  <p className="text-sm leading-relaxed">
+                    K-Fold Cross Validation adalah teknik evaluasi model yang membagi dataset menjadi <span className="font-bold text-white">K bagian (folds)</span> yang sama besar.
+                    Model dilatih dan diuji sebanyak K kali, dimana setiap kali 1 fold digunakan sebagai test set dan K-1 fold sisanya sebagai training set.
+                  </p>
+
+                  <div className="bg-slate-800 p-4 rounded-lg">
+                    <p className="font-semibold text-white mb-2">Keunggulan K-Fold:</p>
+                    <ul className="list-disc list-inside space-y-1 text-sm">
+                      <li>✅ Evaluasi lebih <span className="text-green-400 font-semibold">robust</span> dan <span className="text-green-400 font-semibold">reliable</span></li>
+                      <li>✅ Mengurangi <span className="text-blue-400 font-semibold">bias</span> dari pemilihan data test</li>
+                      <li>✅ Mengukur <span className="text-purple-400 font-semibold">konsistensi</span> model di berbagai subset data</li>
+                      <li>✅ Memberikan <span className="text-orange-400 font-semibold">confidence interval</span> melalui standard deviation</li>
+                      <li>✅ Lebih <span className="text-yellow-400 font-semibold">representatif</span> untuk performa di production</li>
+                    </ul>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div className="bg-blue-900/20 border border-blue-800 p-4 rounded">
+                      <h4 className="font-bold text-blue-400 mb-2">📊 Data Aktual ({data.keterangan_legal})</h4>
+                      <p className="text-sm mb-2">Total Samples: <span className="font-bold text-white">{data.total_samples.toLocaleString()}</span></p>
+                      <p className="text-sm mb-2">Legal: <span className="font-bold text-green-400">{data.legal_count.toLocaleString()}</span></p>
+                      <p className="text-sm">Illegal: <span className="font-bold text-red-400">{data.illegal_count.toLocaleString()}</span></p>
+                    </div>
+
+                    <div className="bg-purple-900/20 border border-purple-800 p-4 rounded">
+                      <h4 className="font-bold text-purple-400 mb-2">🔢 K-Fold Configuration</h4>
+                      <p className="text-sm mb-2">K=3: <span className="font-bold text-white">{data.k_fold_3.fold_results.length} folds</span></p>
+                      <p className="text-sm">K=5: <span className="font-bold text-white">{data.k_fold_5.fold_results.length} folds</span></p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* How K-Fold Works */}
+              <Card className="bg-slate-900 border-slate-800 mb-6">
+                <CardHeader>
+                  <CardTitle className="text-white text-xl">🔄 Cara Kerja K-Fold Cross Validation</CardTitle>
+                  <CardDescription>Proses step-by-step K-Fold dengan data {data.keterangan_legal}</CardDescription>
+                </CardHeader>
+                <CardContent className="text-slate-300 space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">1</div>
+                      <div>
+                        <p className="font-semibold text-white">Shuffle Dataset</p>
+                        <p className="text-sm">Dataset dengan <span className="font-bold text-white">{data.total_samples.toLocaleString()} samples</span> di-shuffle secara random (seed=42 untuk reproducibility)</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <div className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">2</div>
+                      <div>
+                        <p className="font-semibold text-white">Split into K Folds</p>
+                        <p className="text-sm">Dataset dibagi menjadi K bagian yang sama besar:</p>
+                        <div className="mt-2 space-y-2">
+                          <div className="bg-slate-800 p-3 rounded">
+                            <p className="text-xs font-semibold text-white mb-1">K=3 (3-Fold):</p>
+                            {data.k_fold_3.fold_results.map((fold, idx) => (
+                              <p key={idx} className="text-xs">
+                                Fold {fold.fold}: <span className="text-blue-400 font-semibold">{fold.test_size} samples</span>
+                              </p>
+                            ))}
+                          </div>
+                          <div className="bg-slate-800 p-3 rounded">
+                            <p className="text-xs font-semibold text-white mb-1">K=5 (5-Fold):</p>
+                            {data.k_fold_5.fold_results.map((fold, idx) => (
+                              <p key={idx} className="text-xs">
+                                Fold {fold.fold}: <span className="text-purple-400 font-semibold">{fold.test_size} samples</span>
+                              </p>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <div className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">3</div>
+                      <div>
+                        <p className="font-semibold text-white">Train & Test K Times</p>
+                        <p className="text-sm">Untuk setiap fold:</p>
+                        <ul className="list-disc list-inside mt-2 ml-4 space-y-1 text-sm">
+                          <li>Gunakan 1 fold sebagai <span className="text-orange-400 font-semibold">test set</span></li>
+                          <li>Gunakan K-1 fold sisanya sebagai <span className="text-green-400 font-semibold">training set</span></li>
+                          <li>Hitung metrics: Accuracy, Precision, Recall, F1-Score</li>
+                          <li>Simpan hasil untuk averaging nanti</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <div className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">4</div>
+                      <div>
+                        <p className="font-semibold text-white">Calculate Average Metrics</p>
+                        <p className="text-sm">Hitung rata-rata dari semua fold:</p>
+                        <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2">
+                          <div className="bg-slate-800 p-2 rounded text-xs">
+                            <p className="font-semibold text-white">K=3 Results:</p>
+                            <p>Avg Accuracy: <span className="text-green-400 font-bold">{formatPercent(data.k_fold_3.average_accuracy)}</span></p>
+                            <p>Avg F1-Score: <span className="text-orange-400 font-bold">{formatPercent(data.k_fold_3.average_f1_score)}</span></p>
+                          </div>
+                          <div className="bg-slate-800 p-2 rounded text-xs">
+                            <p className="font-semibold text-white">K=5 Results:</p>
+                            <p>Avg Accuracy: <span className="text-green-400 font-bold">{formatPercent(data.k_fold_5.average_accuracy)}</span></p>
+                            <p>Avg F1-Score: <span className="text-orange-400 font-bold">{formatPercent(data.k_fold_5.average_f1_score)}</span></p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <div className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold">5</div>
+                      <div>
+                        <p className="font-semibold text-white">Calculate Standard Deviation</p>
+                        <p className="text-sm">Ukur konsistensi model dengan standard deviation:</p>
+                        <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2">
+                          <div className="bg-slate-800 p-2 rounded text-xs">
+                            <p className="font-semibold text-white">K=3 Consistency:</p>
+                            <p>Std Accuracy: <span className="text-blue-400 font-bold">±{formatPercent(data.k_fold_3.std_accuracy)}</span></p>
+                            <p>Std F1-Score: <span className="text-purple-400 font-bold">±{formatPercent(data.k_fold_3.std_f1_score)}</span></p>
+                          </div>
+                          <div className="bg-slate-800 p-2 rounded text-xs">
+                            <p className="font-semibold text-white">K=5 Consistency:</p>
+                            <p>Std Accuracy: <span className="text-blue-400 font-bold">±{formatPercent(data.k_fold_5.std_accuracy)}</span></p>
+                            <p>Std F1-Score: <span className="text-purple-400 font-bold">±{formatPercent(data.k_fold_5.std_f1_score)}</span></p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Formulas */}
+              <Card className="bg-slate-900 border-slate-800 mb-6">
+                <CardHeader>
+                  <CardTitle className="text-white text-xl">🧮 Rumus Perhitungan K-Fold</CardTitle>
+                  <CardDescription>Formula matematika dengan data aktual {data.keterangan_legal}</CardDescription>
+                </CardHeader>
+                <CardContent className="text-slate-300 space-y-6">
+                  {/* Fold Size Calculation */}
+                  <div className="border-l-4 border-blue-500 pl-4">
+                    <h3 className="text-lg font-bold text-white mb-2">1. Pembagian Fold Size</h3>
+                    <div className="bg-slate-800 p-4 rounded mb-3 font-mono text-sm">
+                      fold_size = ⌊total_samples / k⌋<br/>
+                      sisa = total_samples mod k
+                    </div>
+                    <p className="text-sm mb-2"><span className="font-semibold text-white">Arti:</span> Setiap fold mendapat ukuran yang sama, sisa ditambahkan ke fold terakhir</p>
+
+                    <div className="space-y-3 mt-3">
+                      <div className="bg-slate-800 p-3 rounded text-sm">
+                        <p className="font-semibold text-white mb-2">Perhitungan K=3 ({data.keterangan_legal}):</p>
+                        <p>Total Samples = {data.total_samples}</p>
+                        <p>fold_size = ⌊{data.total_samples} / 3⌋ = {Math.floor(data.total_samples / 3)}</p>
+                        <p>sisa = {data.total_samples} mod 3 = {data.total_samples % 3}</p>
+                        <div className="mt-2 space-y-1">
+                          {data.k_fold_3.fold_results.map((fold, idx) => (
+                            <p key={idx} className="text-blue-400">
+                              Fold {fold.fold}: {fold.test_size} samples
+                              {idx === data.k_fold_3.fold_results.length - 1 && data.total_samples % 3 !== 0 &&
+                                <span className="text-yellow-400 text-xs ml-2">(+{data.total_samples % 3} sisa)</span>
+                              }
+                            </p>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="bg-slate-800 p-3 rounded text-sm">
+                        <p className="font-semibold text-white mb-2">Perhitungan K=5 ({data.keterangan_legal}):</p>
+                        <p>Total Samples = {data.total_samples}</p>
+                        <p>fold_size = ⌊{data.total_samples} / 5⌋ = {Math.floor(data.total_samples / 5)}</p>
+                        <p>sisa = {data.total_samples} mod 5 = {data.total_samples % 5}</p>
+                        <div className="mt-2 space-y-1">
+                          {data.k_fold_5.fold_results.map((fold, idx) => (
+                            <p key={idx} className="text-purple-400">
+                              Fold {fold.fold}: {fold.test_size} samples
+                              {idx === data.k_fold_5.fold_results.length - 1 && data.total_samples % 5 !== 0 &&
+                                <span className="text-yellow-400 text-xs ml-2">(+{data.total_samples % 5} sisa)</span>
+                              }
+                            </p>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Average Metrics */}
+                  <div className="border-l-4 border-green-500 pl-4">
+                    <h3 className="text-lg font-bold text-white mb-2">2. Average Metrics</h3>
+                    <div className="bg-slate-800 p-4 rounded mb-3 font-mono text-sm">
+                      Average = (1/k) × Σ(metric_i) untuk i=1 hingga k
+                    </div>
+                    <p className="text-sm mb-2"><span className="font-semibold text-white">Arti:</span> Rata-rata dari semua fold untuk setiap metrik</p>
+
+                    <div className="bg-slate-800 p-3 rounded text-sm mt-3">
+                      <p className="font-semibold text-white mb-2">Contoh: Average Accuracy K=3</p>
+                      {data.k_fold_3.fold_results.map((fold, idx) => (
+                        <p key={idx}>Fold {fold.fold} Accuracy = {formatPercent(fold.accuracy)}</p>
+                      ))}
+                      <p className="mt-2">Average = ({data.k_fold_3.fold_results.map(f => f.accuracy.toFixed(3)).join(' + ')}) / 3</p>
+                      <p className="text-green-400 font-bold mt-2">
+                        Average Accuracy = {formatPercent(data.k_fold_3.average_accuracy)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Standard Deviation */}
+                  <div className="border-l-4 border-purple-500 pl-4">
+                    <h3 className="text-lg font-bold text-white mb-2">3. Standard Deviation (Konsistensi)</h3>
+                    <div className="bg-slate-800 p-4 rounded mb-3 font-mono text-sm">
+                      σ = √[(1/k) × Σ(metric_i - average)²]
+                    </div>
+                    <p className="text-sm mb-2"><span className="font-semibold text-white">Arti:</span> Mengukur seberapa konsisten model di berbagai fold</p>
+
+                    <div className="bg-slate-800 p-3 rounded text-sm mt-3">
+                      <p className="font-semibold text-white mb-2">Interpretasi Standard Deviation:</p>
+                      <ul className="list-disc list-inside space-y-1">
+                        <li className="text-green-400">σ &lt; 0.01 (1%) = <span className="font-bold">Sangat Konsisten</span> ✅</li>
+                        <li className="text-blue-400">0.01 ≤ σ &lt; 0.05 (1-5%) = <span className="font-bold">Cukup Konsisten</span> ⚠️</li>
+                        <li className="text-red-400">σ ≥ 0.05 (≥5%) = <span className="font-bold">Tidak Konsisten</span> ❌</li>
+                      </ul>
+                      <div className="mt-3 p-2 bg-slate-700 rounded">
+                        <p className="font-semibold text-white">Hasil Aktual ({data.keterangan_legal}):</p>
+                        <p className="text-sm">K=3 Std Accuracy: <span className="text-blue-400 font-bold">±{formatPercent(data.k_fold_3.std_accuracy)}</span></p>
+                        <p className="text-sm">K=5 Std Accuracy: <span className="text-purple-400 font-bold">±{formatPercent(data.k_fold_5.std_accuracy)}</span></p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* K=3 vs K=5 Comparison */}
+              <Card className="bg-gradient-to-br from-slate-900 to-slate-800 border-slate-700 mb-6">
+                <CardHeader>
+                  <CardTitle className="text-white text-xl">⚖️ Perbandingan K=3 vs K=5</CardTitle>
+                  <CardDescription>Analisis perbedaan dan rekomendasi untuk data {data.keterangan_legal}</CardDescription>
+                </CardHeader>
+                <CardContent className="text-slate-300 space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* K=3 */}
+                    <div className="bg-blue-900/20 border border-blue-800 p-4 rounded">
+                      <h4 className="font-bold text-blue-400 mb-3 text-lg">K=3 (3-Fold)</h4>
+                      <div className="space-y-2 text-sm">
+                        <p><span className="font-semibold text-white">Jumlah Evaluasi:</span> 3x</p>
+                        <p><span className="font-semibold text-white">Fold Size:</span> ~{Math.floor(data.total_samples / 3)} samples</p>
+                        <p><span className="font-semibold text-white">Avg Accuracy:</span> <span className="text-green-400 font-bold">{formatPercent(data.k_fold_3.average_accuracy)}</span></p>
+                        <p><span className="font-semibold text-white">Std Accuracy:</span> <span className="text-blue-400 font-bold">±{formatPercent(data.k_fold_3.std_accuracy)}</span></p>
+
+                        <div className="mt-3 pt-3 border-t border-slate-700">
+                          <p className="font-semibold text-white mb-2">Keunggulan:</p>
+                          <ul className="list-disc list-inside space-y-1 text-xs">
+                            <li className="text-green-400">✅ Lebih cepat (3x evaluasi)</li>
+                            <li className="text-green-400">✅ Cocok dataset kecil (&lt;1000)</li>
+                          </ul>
+                          <p className="font-semibold text-white mb-2 mt-2">Kekurangan:</p>
+                          <ul className="list-disc list-inside space-y-1 text-xs">
+                            <li className="text-red-400">❌ Variance bisa lebih tinggi</li>
+                            <li className="text-red-400">❌ Kurang robust</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* K=5 */}
+                    <div className="bg-purple-900/20 border border-purple-800 p-4 rounded">
+                      <h4 className="font-bold text-purple-400 mb-3 text-lg">K=5 (5-Fold)</h4>
+                      <div className="space-y-2 text-sm">
+                        <p><span className="font-semibold text-white">Jumlah Evaluasi:</span> 5x</p>
+                        <p><span className="font-semibold text-white">Fold Size:</span> ~{Math.floor(data.total_samples / 5)} samples</p>
+                        <p><span className="font-semibold text-white">Avg Accuracy:</span> <span className="text-green-400 font-bold">{formatPercent(data.k_fold_5.average_accuracy)}</span></p>
+                        <p><span className="font-semibold text-white">Std Accuracy:</span> <span className="text-purple-400 font-bold">±{formatPercent(data.k_fold_5.std_accuracy)}</span></p>
+
+                        <div className="mt-3 pt-3 border-t border-slate-700">
+                          <p className="font-semibold text-white mb-2">Keunggulan:</p>
+                          <ul className="list-disc list-inside space-y-1 text-xs">
+                            <li className="text-green-400">✅ Lebih robust & reliable</li>
+                            <li className="text-green-400">✅ Variance lebih rendah</li>
+                            <li className="text-green-400">✅ Cocok dataset besar (&gt;1000)</li>
+                          </ul>
+                          <p className="font-semibold text-white mb-2 mt-2">Kekurangan:</p>
+                          <ul className="list-disc list-inside space-y-1 text-xs">
+                            <li className="text-red-400">❌ Lebih lambat (5x evaluasi)</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Recommendation */}
+                  <div className="bg-orange-900/20 border border-orange-800 p-4 rounded mt-4">
+                    <h4 className="font-bold text-orange-400 mb-2">💡 Rekomendasi untuk Dataset Ini</h4>
+                    <p className="text-sm mb-2">
+                      Dataset {data.keterangan_legal} memiliki <span className="font-bold text-white">{data.total_samples.toLocaleString()} samples</span>
+                    </p>
+                    {data.total_samples >= 1000 ? (
+                      <div className="bg-slate-800 p-3 rounded text-sm">
+                        <p className="text-green-400 font-bold mb-2">✅ Rekomendasi: Gunakan K=5</p>
+                        <p className="text-xs">Dataset cukup besar (&gt;1000 samples), K=5 akan memberikan evaluasi yang lebih robust dan reliable dengan variance yang lebih rendah.</p>
+                      </div>
+                    ) : (
+                      <div className="bg-slate-800 p-3 rounded text-sm">
+                        <p className="text-blue-400 font-bold mb-2">⚠️ Rekomendasi: Gunakan K=3</p>
+                        <p className="text-xs">Dataset relatif kecil (&lt;1000 samples), K=3 sudah cukup untuk evaluasi yang baik dengan waktu komputasi yang lebih cepat.</p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Interpretation Guide */}
+              <Card className="bg-gradient-to-br from-slate-900 to-slate-800 border-slate-700">
+                <CardHeader>
+                  <CardTitle className="text-white text-xl">💡 Panduan Interpretasi Hasil K-Fold</CardTitle>
+                  <CardDescription>Cara membaca dan memahami hasil K-Fold Cross Validation</CardDescription>
+                </CardHeader>
+                <CardContent className="text-slate-300 space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-slate-800/50 p-4 rounded">
+                      <h4 className="font-bold text-green-400 mb-2">✅ Model Bagus & Konsisten</h4>
+                      <ul className="text-sm space-y-1 list-disc list-inside">
+                        <li>Average Accuracy &gt; 90%</li>
+                        <li>Std Deviation &lt; 1%</li>
+                        <li>Semua fold punya accuracy serupa</li>
+                        <li>F1-Score &gt; 90%</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-slate-800/50 p-4 rounded">
+                      <h4 className="font-bold text-yellow-400 mb-2">⚠️ Perlu Investigasi</h4>
+                      <ul className="text-sm space-y-1 list-disc list-inside">
+                        <li>Std Deviation &gt; 5%</li>
+                        <li>Ada fold dengan accuracy sangat rendah</li>
+                        <li>Perbedaan besar antar fold</li>
+                        <li>Average accuracy &lt; 80%</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="bg-blue-900/20 border border-blue-800 p-4 rounded mt-4">
+                    <h4 className="font-bold text-blue-400 mb-2">🎯 Hasil Aktual Dataset Ini</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm mt-3">
+                      <div className="bg-slate-800 p-3 rounded">
+                        <p className="font-semibold text-white mb-1">K=3 Performance:</p>
+                        <p className="text-xs">Average Accuracy: <span className="text-green-400 font-bold">{formatPercent(data.k_fold_3.average_accuracy)}</span></p>
+                        <p className="text-xs">Consistency: <span className="text-blue-400 font-bold">±{formatPercent(data.k_fold_3.std_accuracy)}</span></p>
+                        <p className="text-xs mt-2 text-slate-400">{data.k_fold_3_penjelasan.accuracy}</p>
+                      </div>
+                      <div className="bg-slate-800 p-3 rounded">
+                        <p className="font-semibold text-white mb-1">K=5 Performance:</p>
+                        <p className="text-xs">Average Accuracy: <span className="text-green-400 font-bold">{formatPercent(data.k_fold_5.average_accuracy)}</span></p>
+                        <p className="text-xs">Consistency: <span className="text-purple-400 font-bold">±{formatPercent(data.k_fold_5.std_accuracy)}</span></p>
+                        <p className="text-xs mt-2 text-slate-400">{data.k_fold_5_penjelasan.accuracy}</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </>
         ) : null}
 
         {/* Infographic Section */}
         <div className="mt-12 mb-8">
           <h2 className="text-3xl font-bold text-white mb-6 text-center">
-            📊 Penjelasan Proses K-Fold Cross Validation
+            📊 Infografis Proses K-Fold Cross Validation
           </h2>
           <div className="grid grid-cols-1 gap-8">
             {/* Image 1 - Diagram */}
@@ -383,7 +754,7 @@ export default function Proses2Page() {
               </CardHeader>
               <CardContent>
                 <img
-                  src="/proses-2/Proses 2 - Diagram.png"
+                  src="/proses-2/Proses_2_Diagram.png"
                   alt="Proses 2 - Diagram"
                   className="w-full h-auto rounded-lg"
                 />
@@ -398,7 +769,7 @@ export default function Proses2Page() {
               </CardHeader>
               <CardContent>
                 <img
-                  src="/proses-2/Proses 2 - Penjelasan.png"
+                  src="/proses-2/Proses_2_Penjelasan.png"
                   alt="Proses 2 - Penjelasan"
                   className="w-full h-auto rounded-lg"
                 />
@@ -413,7 +784,7 @@ export default function Proses2Page() {
               </CardHeader>
               <CardContent>
                 <img
-                  src="/proses-2/Proses 2 - Penjelasan Angka.png"
+                  src="/proses-2/Proses_2_Penjelasan_Angka.png"
                   alt="Proses 2 - Penjelasan Angka"
                   className="w-full h-auto rounded-lg"
                 />
